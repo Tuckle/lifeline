@@ -70,6 +70,8 @@ export function MemoryDetailPanel({ event }: MemoryDetailPanelProps) {
     yearDate: event.yearDate,
     periodLabel: event.periodLabel,
     importance: event.importance,
+    photoReferenceUrl: event.photoReferenceUrl ?? "",
+    photoAltText: event.photoAltText ?? "",
   };
   const [values, setValues] = useState(initialValues);
 
@@ -206,6 +208,41 @@ export function MemoryDetailPanel({ event }: MemoryDetailPanelProps) {
               }
               value={values.storyText}
             />
+          </div>
+
+          <div className="grid gap-4 rounded-md border border-border bg-background/70 p-4">
+            <div>
+              <h3 className="text-sm font-medium text-foreground">
+                Photo reference
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                Clear the URL to remove the photo reference while keeping the
+                memory.
+              </p>
+            </div>
+            <InlineField
+              error={updateState.fieldErrors.photoReferenceUrl}
+              label="Photo reference URL"
+            >
+              <Input
+                aria-invalid={Boolean(updateState.fieldErrors.photoReferenceUrl)}
+                name="photoReferenceUrl"
+                onChange={(changeEvent) =>
+                  updateValue("photoReferenceUrl", changeEvent.target.value)
+                }
+                type="url"
+                value={values.photoReferenceUrl}
+              />
+            </InlineField>
+            <InlineField label="Photo description">
+              <Input
+                name="photoAltText"
+                onChange={(changeEvent) =>
+                  updateValue("photoAltText", changeEvent.target.value)
+                }
+                value={values.photoAltText}
+              />
+            </InlineField>
           </div>
 
           <fieldset className="grid gap-3">

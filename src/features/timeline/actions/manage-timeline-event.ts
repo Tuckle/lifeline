@@ -108,6 +108,8 @@ async function updateTimelineEvent(
       date_precision: values.datePrecision,
       approximate_date_label: getDateLabel(values),
       importance: values.importance,
+      photo_reference_url: values.photoReferenceUrl || null,
+      photo_alt_text: values.photoAltText || null,
     })
     .eq("id", values.id);
 

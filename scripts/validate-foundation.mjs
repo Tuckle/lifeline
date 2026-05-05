@@ -47,6 +47,7 @@ const requiredPaths = [
   "src/lib/action-result.ts",
   "src/lib/supabase",
   "supabase/migrations/20260505182600_create_timeline_events.sql",
+  "supabase/migrations/20260505201400_add_photo_references_to_timeline_events.sql",
   "supabase/migrations",
 ];
 
@@ -242,6 +243,8 @@ for (const snippet of [
   ".limit(INITIAL_TIMELINE_EVENT_LIMIT)",
   "reachedInitialLimit",
   "TimelineEventSummary",
+  "photo_reference_url",
+  "photo_alt_text",
 ]) {
   if (!listTimelineEventsQuery.includes(snippet)) {
     throw new Error(`Timeline event list query is missing expected snippet: ${snippet}`);
@@ -281,6 +284,9 @@ for (const snippet of [
   "id={`memory-",
   "MemoryDetailPanel",
   "Open detail and actions",
+  "Photo reference",
+  "alt={event.photoAltText",
+  "Open reference",
 ]) {
   if (!memoryAtlasCard.includes(snippet)) {
     throw new Error(`Memory Atlas card is missing expected snippet: ${snippet}`);
@@ -300,6 +306,9 @@ for (const snippet of [
   "Visibility controls",
   "Hide keeps the record",
   "Delete removes this selected timeline event",
+  "Clear the URL to remove the photo reference",
+  "Photo reference URL",
+  "Photo description",
   "window.confirm",
   "submitEvent.preventDefault()",
   "Could not finish that change",
@@ -324,6 +333,9 @@ for (const snippet of [
   "unknown",
   "getDateLabel",
   "getOccurredOn",
+  "photoReferenceUrl",
+  "photoAltText",
+  "URL.canParse",
 ]) {
   if (!timelineEventSchema.includes(snippet)) {
     throw new Error(`Timeline event schema is missing expected snippet: ${snippet}`);
@@ -344,6 +356,8 @@ for (const snippet of [
   "ErrorCodes.validationFailed",
   "ErrorCodes.permissionDenied",
   "ErrorCodes.timelineEventCreateFailed",
+  "photo_reference_url",
+  "photo_alt_text",
   "revalidatePath(\"/timeline\")",
 ]) {
   if (!createTimelineEventAction.includes(snippet)) {
@@ -369,6 +383,8 @@ for (const snippet of [
   "ErrorCodes.timelineEventUpdateFailed",
   "ErrorCodes.timelineEventHideFailed",
   "ErrorCodes.timelineEventDeleteFailed",
+  "photo_reference_url",
+  "photo_alt_text",
   "revalidatePath(\"/timeline\")",
 ]) {
   if (!manageTimelineEventAction.includes(snippet)) {
@@ -393,6 +409,9 @@ for (const snippet of [
   "Save memory",
   "Saved on the line",
   "Importance:",
+  "Photo reference URL",
+  "Photo description",
+  "uploads come",
   "min-h-11",
 ]) {
   if (!memoryCreationForm.includes(snippet)) {
@@ -550,6 +569,33 @@ for (const snippet of [
   if (!timelineEventsMigration.includes(snippet)) {
     throw new Error(`Timeline events migration is missing expected snippet: ${snippet}`);
   }
+}
+
+const timelinePhotoReferencesMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260505201400_add_photo_references_to_timeline_events.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "photo_reference_url",
+  "photo_alt_text",
+  "timeline_events_photo_reference_url_length",
+  "timeline_events_photo_alt_text_length",
+]) {
+  if (!timelinePhotoReferencesMigration.includes(snippet)) {
+    throw new Error(`Photo reference migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const publicSourceSnapshot = [
+  memoryCreationForm,
+  memoryDetailPanel,
+  memoryAtlasCard,
+  createTimelineEventAction,
+  manageTimelineEventAction,
+].join("\n");
+
+if (/public\/.*(photo|memory|timeline)|NEXT_PUBLIC_.*(photo|media|storage)/i.test(publicSourceSnapshot)) {
+  throw new Error("Photo references must not introduce public private-media storage");
 }
 
 const seedSql = readFileSync(path.join(root, "supabase/seed.sql"), "utf8");

@@ -158,6 +158,46 @@ export function MemoryCreationForm() {
             />
           </FieldBlock>
 
+          <div className="grid gap-4 rounded-md border border-border bg-background/70 p-4">
+            <div>
+              <h2 className="text-sm font-medium text-foreground">
+                Photo reference
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                Optional. Add a private reference link you control; uploads come
+                later with private storage.
+              </p>
+            </div>
+            <FieldBlock
+              error={state.fieldErrors.photoReferenceUrl}
+              label="Photo reference URL"
+            >
+              <Input
+                aria-invalid={Boolean(state.fieldErrors.photoReferenceUrl)}
+                name="photoReferenceUrl"
+                onChange={(event) =>
+                  updateValue("photoReferenceUrl", event.target.value)
+                }
+                placeholder="https://..."
+                type="url"
+                value={values.photoReferenceUrl}
+              />
+            </FieldBlock>
+            <FieldBlock
+              help="Used when an image preview is shown."
+              label="Photo description"
+            >
+              <Input
+                name="photoAltText"
+                onChange={(event) =>
+                  updateValue("photoAltText", event.target.value)
+                }
+                placeholder="A short description of the image"
+                value={values.photoAltText}
+              />
+            </FieldBlock>
+          </div>
+
           <fieldset className="grid gap-3">
             <legend className="text-sm font-medium text-foreground">
               Importance

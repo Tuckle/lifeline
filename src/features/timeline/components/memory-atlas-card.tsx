@@ -20,7 +20,23 @@ export function MemoryAtlasCard({ event }: MemoryAtlasCardProps) {
         <Badge variant="secondary">Memory</Badge>
         <Badge variant="outline">{event.sourceLabel}</Badge>
         <Badge variant="outline">Status: {event.status}</Badge>
+        {event.photoReferenceUrl ? (
+          <Badge variant="outline">Photo reference</Badge>
+        ) : null}
       </div>
+
+      {event.photoReferenceUrl ? (
+        <div className="mt-4 overflow-hidden rounded-md border border-border bg-background">
+          {/* User-controlled external references are not app-owned optimized media. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            alt={event.photoAltText || `Photo reference for ${event.title}`}
+            className="aspect-[4/3] w-full object-cover"
+            loading="lazy"
+            src={event.photoReferenceUrl}
+          />
+        </div>
+      ) : null}
 
       <p className="mt-4 text-sm font-medium text-muted-foreground">
         {dateLabel}
@@ -32,6 +48,20 @@ export function MemoryAtlasCard({ event }: MemoryAtlasCardProps) {
       {preview ? (
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           {preview}
+        </p>
+      ) : null}
+
+      {event.photoReferenceUrl ? (
+        <p className="mt-3 break-words text-sm text-muted-foreground">
+          Photo reference:{" "}
+          <a
+            className="font-medium text-primary underline-offset-4 hover:underline"
+            href={event.photoReferenceUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Open reference
+          </a>
         </p>
       ) : null}
 

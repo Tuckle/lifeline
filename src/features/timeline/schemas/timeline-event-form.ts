@@ -26,6 +26,15 @@ export const timelineEventFormSchema = z
     yearDate: z.string().trim().optional(),
     periodLabel: z.string().trim().max(120).optional(),
     importance: z.enum(importanceValues),
+    photoReferenceUrl: z
+      .string()
+      .trim()
+      .max(2048)
+      .optional()
+      .refine((value) => !value || URL.canParse(value), {
+        message: "Add a valid photo reference URL, or leave it empty.",
+      }),
+    photoAltText: z.string().trim().max(240).optional(),
   })
   .superRefine((value, ctx) => {
     if (value.datePrecision === "exact" && !value.exactDate) {
@@ -78,6 +87,8 @@ export function getTimelineEventFormValues(formData: FormData) {
     yearDate: String(formData.get("yearDate") ?? ""),
     periodLabel: String(formData.get("periodLabel") ?? ""),
     importance: String(formData.get("importance") ?? "unset"),
+    photoReferenceUrl: String(formData.get("photoReferenceUrl") ?? ""),
+    photoAltText: String(formData.get("photoAltText") ?? ""),
   };
 }
 

@@ -37,6 +37,8 @@ export const initialTimelineEventFormState: TimelineEventFormState = {
     yearDate: "",
     periodLabel: "",
     importance: "unset",
+    photoReferenceUrl: "",
+    photoAltText: "",
   },
   fieldErrors: {},
 };
@@ -104,6 +106,8 @@ export async function createTimelineEvent(
       date_precision: values.datePrecision,
       approximate_date_label: dateLabel,
       importance: values.importance,
+      photo_reference_url: values.photoReferenceUrl || null,
+      photo_alt_text: values.photoAltText || null,
       status: "active",
       source_type: "manual",
       source_label: "Manual",

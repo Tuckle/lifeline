@@ -12,5 +12,7 @@ export type TimelineEventSummary = {
   importance: string;
   status: string;
   sourceLabel: string;
+  photoReferenceUrl: string | null;
+  photoAltText: string | null;
   createdAt: string;
 };

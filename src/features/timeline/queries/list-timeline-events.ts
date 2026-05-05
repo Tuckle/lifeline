@@ -15,6 +15,8 @@ type TimelineEventRow = {
   importance: string;
   status: string;
   source_label: string;
+  photo_reference_url: string | null;
+  photo_alt_text: string | null;
   created_at: string;
 };
 
@@ -37,7 +39,7 @@ export async function listTimelineEvents(): Promise<
   const { data, error } = await supabase
     .from("timeline_events")
     .select(
-      "id,title,story_text,occurred_on,date_precision,approximate_date_label,importance,status,source_label,created_at",
+      "id,title,story_text,occurred_on,date_precision,approximate_date_label,importance,status,source_label,photo_reference_url,photo_alt_text,created_at",
     )
     .eq("status", "active")
     .order("occurred_on", { ascending: true, nullsFirst: false })
@@ -82,6 +84,8 @@ function mapTimelineEvent(row: TimelineEventRow): TimelineEventSummary {
     importance: row.importance,
     status: row.status,
     sourceLabel: row.source_label,
+    photoReferenceUrl: row.photo_reference_url,
+    photoAltText: row.photo_alt_text,
     createdAt: row.created_at,
   };
 }
