@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { MemoryDetailPanel } from "@/features/timeline/components/memory-detail-panel";
 import type { TimelineEventSummary } from "@/features/timeline/types";
 
 type MemoryAtlasCardProps = {
@@ -42,6 +43,17 @@ export function MemoryAtlasCard({ event }: MemoryAtlasCardProps) {
           Date type: {event.datePrecision}
         </span>
       </div>
+
+      <details className="group mt-4 rounded-md border border-border bg-background/70">
+        <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+          Open detail and actions
+          <span className="text-muted-foreground group-open:hidden">+</span>
+          <span className="hidden text-muted-foreground group-open:inline">
+            -
+          </span>
+        </summary>
+        <MemoryDetailPanel event={event} />
+      </details>
     </article>
   );
 }

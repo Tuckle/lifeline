@@ -61,7 +61,12 @@ export const timelineEventFormSchema = z
     }
   });
 
+export const timelineEventUpdateSchema = timelineEventFormSchema.extend({
+  id: z.uuid(),
+});
+
 export type TimelineEventFormValues = z.infer<typeof timelineEventFormSchema>;
+export type TimelineEventUpdateValues = z.infer<typeof timelineEventUpdateSchema>;
 
 export function getTimelineEventFormValues(formData: FormData) {
   return {

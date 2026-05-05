@@ -19,7 +19,9 @@ const requiredPaths = [
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
+  "src/features/timeline/actions/manage-timeline-event.ts",
   "src/features/timeline/components/memory-creation-form.tsx",
+  "src/features/timeline/components/memory-detail-panel.tsx",
   "src/features/timeline/schemas/timeline-event-form.ts",
   "src/app/(workspace)/imports/page.tsx",
   "src/app/(workspace)/reflect/page.tsx",
@@ -277,9 +279,33 @@ for (const snippet of [
   "event.title",
   "event.storyText",
   "id={`memory-",
+  "MemoryDetailPanel",
+  "Open detail and actions",
 ]) {
   if (!memoryAtlasCard.includes(snippet)) {
     throw new Error(`Memory Atlas card is missing expected snippet: ${snippet}`);
+  }
+}
+
+const memoryDetailPanel = readFileSync(
+  path.join(root, "src/features/timeline/components/memory-detail-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "MemoryDetailPanel",
+  "Memory detail",
+  "Save changes",
+  "Hide memory",
+  "Delete memory",
+  "Visibility controls",
+  "Hide keeps the record",
+  "Delete removes this selected timeline event",
+  "window.confirm",
+  "submitEvent.preventDefault()",
+  "Could not finish that change",
+]) {
+  if (!memoryDetailPanel.includes(snippet)) {
+    throw new Error(`Memory detail panel is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -322,6 +348,31 @@ for (const snippet of [
 ]) {
   if (!createTimelineEventAction.includes(snippet)) {
     throw new Error(`Create timeline event action is missing expected snippet: ${snippet}`);
+  }
+}
+
+const manageTimelineEventAction = readFileSync(
+  path.join(root, "src/features/timeline/actions/manage-timeline-event.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "updateTimelineEventAction",
+  "hideTimelineEventAction",
+  "deleteTimelineEventAction",
+  "timelineEventUpdateSchema.safeParse",
+  ".from(\"timeline_events\")",
+  ".update",
+  ".delete()",
+  ".eq(\"id\"",
+  "status: \"hidden\"",
+  "ErrorCodes.timelineEventUpdateFailed",
+  "ErrorCodes.timelineEventHideFailed",
+  "ErrorCodes.timelineEventDeleteFailed",
+  "revalidatePath(\"/timeline\")",
+]) {
+  if (!manageTimelineEventAction.includes(snippet)) {
+    throw new Error(`Manage timeline event action is missing expected snippet: ${snippet}`);
   }
 }
 

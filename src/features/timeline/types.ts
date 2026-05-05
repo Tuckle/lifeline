@@ -4,6 +4,10 @@ export type TimelineEventSummary = {
   storyText: string | null;
   occurredOn: string | null;
   datePrecision: string;
+  exactDate: string;
+  monthDate: string;
+  yearDate: string;
+  periodLabel: string;
   approximateDateLabel: string | null;
   importance: string;
   status: string;

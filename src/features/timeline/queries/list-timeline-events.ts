@@ -66,12 +66,18 @@ export async function listTimelineEvents(): Promise<
 }
 
 function mapTimelineEvent(row: TimelineEventRow): TimelineEventSummary {
+  const occurredOn = row.occurred_on ?? "";
+
   return {
     id: row.id,
     title: row.title,
     storyText: row.story_text,
     occurredOn: row.occurred_on,
     datePrecision: row.date_precision,
+    exactDate: row.date_precision === "exact" ? occurredOn : "",
+    monthDate: row.date_precision === "month" ? occurredOn.slice(0, 7) : "",
+    yearDate: row.date_precision === "year" ? occurredOn.slice(0, 4) : "",
+    periodLabel: row.date_precision === "period" ? (row.approximate_date_label ?? "") : "",
     approximateDateLabel: row.approximate_date_label,
     importance: row.importance,
     status: row.status,
