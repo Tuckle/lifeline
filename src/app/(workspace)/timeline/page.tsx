@@ -1,5 +1,5 @@
-import { WorkspacePlaceholder } from "@/components/layout/workspace-placeholder";
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
+import { EmptyMemoryAtlasTimeline } from "@/features/timeline/components/empty-memory-atlas-timeline";
 import { Suspense } from "react";
 
 export default function TimelinePage() {
@@ -13,10 +13,5 @@ export default function TimelinePage() {
 async function TimelineContent() {
   await requireWorkspaceUser("/timeline");
 
-  return (
-    <WorkspacePlaceholder
-      title="Timeline"
-      description="Your private life timeline will appear here once timeline events are added."
-    />
-  );
+  return <EmptyMemoryAtlasTimeline />;
 }

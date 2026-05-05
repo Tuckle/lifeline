@@ -12,6 +12,7 @@ const requiredPaths = [
   "src/proxy.ts",
   "src/app",
   "src/app/(workspace)/timeline/page.tsx",
+  "src/features/timeline/components/empty-memory-atlas-timeline.tsx",
   "src/app/(workspace)/add/page.tsx",
   "src/app/(workspace)/imports/page.tsx",
   "src/app/(workspace)/reflect/page.tsx",
@@ -35,6 +36,7 @@ const requiredPaths = [
   "src/features/auth/require-workspace-user.ts",
   "src/lib/action-result.ts",
   "src/lib/supabase",
+  "supabase/migrations/20260505182600_create_timeline_events.sql",
   "supabase/migrations",
 ];
 
@@ -195,6 +197,38 @@ if (!protectedPage.includes('redirect("/timeline")')) {
   throw new Error("/protected should redirect to the Timeline workspace home");
 }
 
+const timelinePage = readFileSync(
+  path.join(root, "src/app/(workspace)/timeline/page.tsx"),
+  "utf8",
+);
+for (const snippet of ["requireWorkspaceUser(\"/timeline\")", "EmptyMemoryAtlasTimeline"]) {
+  if (!timelinePage.includes(snippet)) {
+    throw new Error(`Timeline page is missing empty Memory Atlas integration: ${snippet}`);
+  }
+}
+
+const emptyTimeline = readFileSync(
+  path.join(root, "src/features/timeline/components/empty-memory-atlas-timeline.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "EmptyMemoryAtlasTimeline",
+  "Your life-line is ready.",
+  "Present",
+  "Past",
+  "Future",
+  "Add memory",
+  "Add future intention",
+  "Import context",
+  "bg-timeline",
+  "bg-reflection",
+  "min-h-14",
+]) {
+  if (!emptyTimeline.includes(snippet)) {
+    throw new Error(`Empty timeline surface is missing expected snippet: ${snippet}`);
+  }
+}
+
 for (const staleProtectedTarget of [
   "src/components/sign-up-form.tsx",
   "src/components/update-password-form.tsx",
@@ -298,6 +332,35 @@ for (const [filePath, snippets] of Object.entries({
       throw new Error(`${filePath} is missing accessible primitive snippet: ${snippet}`);
     }
   }
+}
+
+const timelineEventsMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260505182600_create_timeline_events.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "create table if not exists public.timeline_events",
+  "user_id uuid not null references auth.users(id) on delete cascade",
+  "date_precision",
+  "approximate_date_label",
+  "importance",
+  "status",
+  "source_type",
+  "alter table public.timeline_events enable row level security",
+  "auth.uid() = user_id",
+  "timeline_events_select_own",
+  "timeline_events_insert_own",
+  "timeline_events_update_own",
+  "timeline_events_delete_own",
+]) {
+  if (!timelineEventsMigration.includes(snippet)) {
+    throw new Error(`Timeline events migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const seedSql = readFileSync(path.join(root, "supabase/seed.sql"), "utf8");
+if (/insert\s+into\s+public\.timeline_events/i.test(seedSql)) {
+  throw new Error("Seed data must not include private timeline events");
 }
 
 const sourceFilesToScan = [
