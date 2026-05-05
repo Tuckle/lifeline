@@ -12,6 +12,17 @@ import { createClient } from "@/lib/supabase/client";
 import { cn, hasEnvVars } from "@/lib/utils";
 import { useState } from "react";
 
+function getSafeNextPath() {
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get("next");
+
+  if (next?.startsWith("/") && !next.startsWith("//")) {
+    return next;
+  }
+
+  return "/protected";
+}
+
 export function LoginForm({
   className,
   ...props
@@ -24,7 +35,8 @@ export function LoginForm({
     setIsLoading(true);
     setError(null);
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=/protected`;
+    const next = getSafeNextPath();
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

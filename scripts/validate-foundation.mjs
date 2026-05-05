@@ -9,7 +9,14 @@ const requiredPaths = [
   ".gitignore",
   "README.md",
   ".github/workflows/ci.yml",
+  "src/proxy.ts",
   "src/app",
+  "src/app/(workspace)/timeline/page.tsx",
+  "src/app/(workspace)/add/page.tsx",
+  "src/app/(workspace)/imports/page.tsx",
+  "src/app/(workspace)/reflect/page.tsx",
+  "src/app/(workspace)/search/page.tsx",
+  "src/app/(workspace)/settings/page.tsx",
   "src/components/ui",
   "src/components/layout",
   "src/features/auth",
@@ -19,6 +26,7 @@ const requiredPaths = [
   "src/features/settings",
   "src/features/offline",
   "src/app/auth/callback/route.ts",
+  "src/features/auth/require-workspace-user.ts",
   "src/lib/action-result.ts",
   "src/lib/supabase",
   "supabase/migrations",
@@ -87,7 +95,8 @@ for (const snippet of [
   "Continue with Google",
   "signInWithOAuth",
   'provider: "google"',
-  "/auth/callback?next=/protected",
+  "/auth/callback?next=",
+  "getSafeNextPath",
   "Supabase setup required",
   "private space",
 ]) {
@@ -119,6 +128,33 @@ for (const snippet of ["redirect(\"/auth/login\")", "redirect(\"/protected\")"])
   }
 }
 
+const proxy = readFileSync(path.join(root, "src/lib/supabase/proxy.ts"), "utf8");
+for (const snippet of [
+  "protectedRoutePrefixes",
+  '"/timeline"',
+  '"/add"',
+  '"/imports"',
+  '"/reflect"',
+  '"/search"',
+  '"/settings"',
+  "redirectToLogin",
+  'url.searchParams.set("next"',
+]) {
+  if (!proxy.includes(snippet)) {
+    throw new Error(`Proxy route protection is missing expected snippet: ${snippet}`);
+  }
+}
+
+const workspaceUser = readFileSync(
+  path.join(root, "src/features/auth/require-workspace-user.ts"),
+  "utf8",
+);
+for (const snippet of ["requireWorkspaceUser", "getClaims", "getLoginPath", "encodeURIComponent(nextPath)"]) {
+  if (!workspaceUser.includes(snippet)) {
+    throw new Error(`Workspace auth helper is missing expected snippet: ${snippet}`);
+  }
+}
+
 const layout = readFileSync(path.join(root, "src/app/layout.tsx"), "utf8");
 if (!layout.includes('title: "Lifeline"')) {
   throw new Error("Root metadata must use Lifeline product naming");
@@ -144,6 +180,8 @@ const sourceSnapshot = [
   rootPage,
   readFileSync(path.join(root, "src/components/logout-button.tsx"), "utf8"),
   readFileSync(path.join(root, "src/components/auth-button.tsx"), "utf8"),
+  proxy,
+  workspaceUser,
 ].join("\n");
 
 if (hardcodedIdentityPattern.test(sourceSnapshot)) {
