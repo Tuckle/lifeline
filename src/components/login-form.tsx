@@ -20,7 +20,7 @@ function getSafeNextPath() {
     return next;
   }
 
-  return "/protected";
+  return "/timeline";
 }
 
 export function LoginForm({

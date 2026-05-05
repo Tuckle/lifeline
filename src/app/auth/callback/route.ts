@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
-const defaultRedirectPath = "/protected";
+const defaultRedirectPath = "/timeline";
 
 function getSafeNextPath(next: string | null) {
   if (next?.startsWith("/") && !next.startsWith("//")) {

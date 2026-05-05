@@ -11,7 +11,7 @@ export default async function Home() {
   const { data } = await supabase.auth.getClaims();
 
   if (data?.claims) {
-    redirect("/protected");
+    redirect("/timeline");
   }
 
   redirect("/auth/login");

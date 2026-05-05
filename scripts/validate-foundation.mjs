@@ -17,6 +17,8 @@ const requiredPaths = [
   "src/app/(workspace)/reflect/page.tsx",
   "src/app/(workspace)/search/page.tsx",
   "src/app/(workspace)/settings/page.tsx",
+  "src/components/layout/workspace-shell.tsx",
+  "src/components/layout/workspace-navigation.tsx",
   "src/components/ui",
   "src/components/layout",
   "src/features/auth",
@@ -122,9 +124,71 @@ for (const snippet of [
 }
 
 const rootPage = readFileSync(path.join(root, "src/app/page.tsx"), "utf8");
-for (const snippet of ["redirect(\"/auth/login\")", "redirect(\"/protected\")"]) {
+for (const snippet of ["redirect(\"/auth/login\")", "redirect(\"/timeline\")"]) {
   if (!rootPage.includes(snippet)) {
     throw new Error(`Root route is missing auth redirect: ${snippet}`);
+  }
+}
+
+const workspaceShell = readFileSync(
+  path.join(root, "src/components/layout/workspace-shell.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "WorkspaceShell",
+  "DesktopWorkspaceNavigation",
+  "MobileWorkspaceNavigation",
+  "AuthButton",
+  "Private workspace",
+  "lg:grid-cols",
+]) {
+  if (!workspaceShell.includes(snippet)) {
+    throw new Error(`Workspace shell is missing expected snippet: ${snippet}`);
+  }
+}
+
+const workspaceNavigation = readFileSync(
+  path.join(root, "src/components/layout/workspace-navigation.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "workspaceNavItems",
+  'href: "/timeline"',
+  'href: "/add"',
+  'href: "/imports"',
+  'href: "/reflect"',
+  'href: "/search"',
+  'href: "/settings"',
+  "usePathname",
+  "aria-current",
+  "min-h-11",
+  "MobileWorkspaceNavigation",
+]) {
+  if (!workspaceNavigation.includes(snippet)) {
+    throw new Error(`Workspace navigation is missing expected snippet: ${snippet}`);
+  }
+}
+
+const workspaceLayout = readFileSync(
+  path.join(root, "src/app/(workspace)/layout.tsx"),
+  "utf8",
+);
+if (!workspaceLayout.includes("<WorkspaceShell>{children}</WorkspaceShell>")) {
+  throw new Error("Workspace route group layout must render the shared workspace shell");
+}
+
+const protectedPage = readFileSync(path.join(root, "src/app/protected/page.tsx"), "utf8");
+if (!protectedPage.includes('redirect("/timeline")')) {
+  throw new Error("/protected should redirect to the Timeline workspace home");
+}
+
+for (const staleProtectedTarget of [
+  "src/components/sign-up-form.tsx",
+  "src/components/update-password-form.tsx",
+]) {
+  const file = readFileSync(path.join(root, staleProtectedTarget), "utf8");
+  if (file.includes("/protected")) {
+    throw new Error(`${staleProtectedTarget} should send users to /timeline, not /protected`);
   }
 }
 
