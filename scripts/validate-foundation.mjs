@@ -14,6 +14,9 @@ const requiredPaths = [
   "src/app/(workspace)/timeline/page.tsx",
   "src/features/timeline/components/empty-memory-atlas-timeline.tsx",
   "src/app/(workspace)/add/page.tsx",
+  "src/features/timeline/actions/create-timeline-event.ts",
+  "src/features/timeline/components/memory-creation-form.tsx",
+  "src/features/timeline/schemas/timeline-event-form.ts",
   "src/app/(workspace)/imports/page.tsx",
   "src/app/(workspace)/reflect/page.tsx",
   "src/app/(workspace)/search/page.tsx",
@@ -25,6 +28,7 @@ const requiredPaths = [
   "src/components/ui/dialog.tsx",
   "src/components/ui/sheet.tsx",
   "src/components/ui/sonner.tsx",
+  "src/components/ui/textarea.tsx",
   "src/components/layout",
   "src/features/auth",
   "src/features/timeline",
@@ -58,6 +62,7 @@ if (missingScripts.length > 0) {
 for (const [dependency, expectedVersion] of Object.entries({
   "@radix-ui/react-dialog": "1.1.15",
   sonner: "2.0.7",
+  zod: "4.4.3",
 })) {
   if (packageJson.dependencies?.[dependency] !== expectedVersion) {
     throw new Error(`${dependency} must be pinned to ${expectedVersion}`);
@@ -207,6 +212,79 @@ for (const snippet of ["requireWorkspaceUser(\"/timeline\")", "EmptyMemoryAtlasT
   }
 }
 
+const addPage = readFileSync(path.join(root, "src/app/(workspace)/add/page.tsx"), "utf8");
+for (const snippet of ["requireWorkspaceUser(\"/add\")", "MemoryCreationForm"]) {
+  if (!addPage.includes(snippet)) {
+    throw new Error(`Add page is missing memory creation integration: ${snippet}`);
+  }
+}
+
+const timelineEventSchema = readFileSync(
+  path.join(root, "src/features/timeline/schemas/timeline-event-form.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "zod",
+  "timelineEventFormSchema",
+  "datePrecisionValues",
+  "exact",
+  "month",
+  "year",
+  "period",
+  "unknown",
+  "getDateLabel",
+  "getOccurredOn",
+]) {
+  if (!timelineEventSchema.includes(snippet)) {
+    throw new Error(`Timeline event schema is missing expected snippet: ${snippet}`);
+  }
+}
+
+const createTimelineEventAction = readFileSync(
+  path.join(root, "src/features/timeline/actions/create-timeline-event.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "ActionResult<CreatedTimelineEvent>",
+  "timelineEventFormSchema.safeParse",
+  "supabase.auth.getClaims",
+  ".from(\"timeline_events\")",
+  ".insert",
+  "ErrorCodes.validationFailed",
+  "ErrorCodes.permissionDenied",
+  "ErrorCodes.timelineEventCreateFailed",
+  "revalidatePath(\"/timeline\")",
+]) {
+  if (!createTimelineEventAction.includes(snippet)) {
+    throw new Error(`Create timeline event action is missing expected snippet: ${snippet}`);
+  }
+}
+
+const memoryCreationForm = readFileSync(
+  path.join(root, "src/features/timeline/components/memory-creation-form.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "useActionState",
+  "MemoryCreationForm",
+  "Memory title",
+  "Date precision",
+  "Exact date",
+  "Month and year",
+  "Year",
+  "Period label",
+  "Timeline preview",
+  "Save memory",
+  "Saved on the line",
+  "Importance:",
+  "min-h-11",
+]) {
+  if (!memoryCreationForm.includes(snippet)) {
+    throw new Error(`Memory creation form is missing expected snippet: ${snippet}`);
+  }
+}
+
 const emptyTimeline = readFileSync(
   path.join(root, "src/features/timeline/components/empty-memory-atlas-timeline.tsx"),
   "utf8",
@@ -324,6 +402,7 @@ for (const [filePath, snippets] of Object.entries({
   "src/components/ui/sonner.tsx": ["Sonner", "toastOptions", "shadow-soft"],
   "src/components/ui/button.tsx": ["min-h-11", "focus-visible:ring-2", "ring-focus"],
   "src/components/ui/input.tsx": ["min-h-11", "focus-visible:ring-2", "ring-focus"],
+  "src/components/ui/textarea.tsx": ["min-h-32", "focus-visible:ring-2", "ring-focus"],
   "src/components/ui/checkbox.tsx": ["h-5 w-5", "focus-visible:ring-2", "ring-focus"],
 })) {
   const file = readFileSync(path.join(root, filePath), "utf8");
