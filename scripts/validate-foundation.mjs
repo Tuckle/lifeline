@@ -13,6 +13,10 @@ const requiredPaths = [
   "src/app",
   "src/app/(workspace)/timeline/page.tsx",
   "src/features/timeline/components/empty-memory-atlas-timeline.tsx",
+  "src/features/timeline/components/life-line-timeline.tsx",
+  "src/features/timeline/components/memory-atlas-card.tsx",
+  "src/features/timeline/queries/list-timeline-events.ts",
+  "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
   "src/features/timeline/components/memory-creation-form.tsx",
@@ -206,9 +210,13 @@ const timelinePage = readFileSync(
   path.join(root, "src/app/(workspace)/timeline/page.tsx"),
   "utf8",
 );
-for (const snippet of ["requireWorkspaceUser(\"/timeline\")", "EmptyMemoryAtlasTimeline"]) {
+for (const snippet of [
+  "requireWorkspaceUser(\"/timeline\")",
+  "listTimelineEvents",
+  "LifeLineTimeline",
+]) {
   if (!timelinePage.includes(snippet)) {
-    throw new Error(`Timeline page is missing empty Memory Atlas integration: ${snippet}`);
+    throw new Error(`Timeline page is missing timeline integration: ${snippet}`);
   }
 }
 
@@ -216,6 +224,62 @@ const addPage = readFileSync(path.join(root, "src/app/(workspace)/add/page.tsx")
 for (const snippet of ["requireWorkspaceUser(\"/add\")", "MemoryCreationForm"]) {
   if (!addPage.includes(snippet)) {
     throw new Error(`Add page is missing memory creation integration: ${snippet}`);
+  }
+}
+
+const listTimelineEventsQuery = readFileSync(
+  path.join(root, "src/features/timeline/queries/list-timeline-events.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "INITIAL_TIMELINE_EVENT_LIMIT = 50",
+  "supabase.auth.getClaims",
+  ".from(\"timeline_events\")",
+  ".eq(\"status\", \"active\")",
+  ".order(\"occurred_on\"",
+  ".limit(INITIAL_TIMELINE_EVENT_LIMIT)",
+  "reachedInitialLimit",
+  "TimelineEventSummary",
+]) {
+  if (!listTimelineEventsQuery.includes(snippet)) {
+    throw new Error(`Timeline event list query is missing expected snippet: ${snippet}`);
+  }
+}
+
+const lifeLineTimeline = readFileSync(
+  path.join(root, "src/features/timeline/components/life-line-timeline.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "LifeLineTimeline",
+  "EmptyMemoryAtlasTimeline",
+  "MemoryAtlasCard",
+  "Present",
+  "Future space",
+  "reachedInitialLimit",
+  "Incremental loading",
+]) {
+  if (!lifeLineTimeline.includes(snippet)) {
+    throw new Error(`Life-line timeline is missing expected snippet: ${snippet}`);
+  }
+}
+
+const memoryAtlasCard = readFileSync(
+  path.join(root, "src/features/timeline/components/memory-atlas-card.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "MemoryAtlasCard",
+  "Status:",
+  "Importance:",
+  "Date type:",
+  "event.sourceLabel",
+  "event.title",
+  "event.storyText",
+  "id={`memory-",
+]) {
+  if (!memoryAtlasCard.includes(snippet)) {
+    throw new Error(`Memory Atlas card is missing expected snippet: ${snippet}`);
   }
 }
 

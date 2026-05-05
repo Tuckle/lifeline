@@ -1,5 +1,5 @@
 # generated: 2026-05-04T19:20:41+0300
-# last_updated: 2026-05-05T19:07:00+0300
+# last_updated: 2026-05-05T19:29:00+0300
 # project: lifeline
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: "2026-05-04T19:20:41+0300"
-last_updated: "2026-05-05T19:07:00+0300"
+last_updated: "2026-05-05T19:29:00+0300"
 project: lifeline
 project_key: NOKEY
 tracking_system: file-system
@@ -52,7 +52,7 @@ development_status:
   epic-2: in-progress
   2-1-empty-memory-atlas-timeline: done
   2-2-create-life-event-with-approximate-date: done
-  2-3-browse-timeline-with-present-anchor: backlog
+  2-3-browse-timeline-with-present-anchor: done
   2-4-memory-detail-edit-hide-and-delete: backlog
   2-5-story-text-and-photo-references: backlog
   2-6-importance-weighting: backlog
