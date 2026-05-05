@@ -22,6 +22,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-or-anon-key
 
 Never store service-role keys, import tokens, source secrets, or private user data in `NEXT_PUBLIC_*` variables.
 
+Google OAuth is configured in Supabase Auth provider settings, not through public app environment variables. For local development, add `http://localhost:3000/auth/callback` to the Supabase Auth redirect allow list and use the matching local Site URL.
+
 ## Development
 
 ```bash

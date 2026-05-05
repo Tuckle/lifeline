@@ -18,6 +18,7 @@ const requiredPaths = [
   "src/features/reviews",
   "src/features/settings",
   "src/features/offline",
+  "src/app/auth/callback/route.ts",
   "src/lib/action-result.ts",
   "src/lib/supabase",
   "supabase/migrations",
@@ -72,11 +73,81 @@ for (const snippet of [
   "tests near the behavior",
   "Vercel-compatible",
   "local component state",
+  "Google OAuth",
+  "http://localhost:3000/auth/callback",
   "Supabase backups",
 ]) {
   if (!readme.includes(snippet)) {
     throw new Error(`README.md is missing foundation convention: ${snippet}`);
   }
+}
+
+const loginForm = readFileSync(path.join(root, "src/components/login-form.tsx"), "utf8");
+for (const snippet of [
+  "Continue with Google",
+  "signInWithOAuth",
+  'provider: "google"',
+  "/auth/callback?next=/protected",
+  "Supabase setup required",
+  "private space",
+]) {
+  if (!loginForm.includes(snippet)) {
+    throw new Error(`Google login form is missing expected snippet: ${snippet}`);
+  }
+}
+
+const callbackRoute = readFileSync(
+  path.join(root, "src/app/auth/callback/route.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "exchangeCodeForSession",
+  "error_description",
+  "getSafeNextPath",
+  "!next.startsWith(\"//\")",
+  "/auth/error",
+]) {
+  if (!callbackRoute.includes(snippet)) {
+    throw new Error(`OAuth callback route is missing expected snippet: ${snippet}`);
+  }
+}
+
+const rootPage = readFileSync(path.join(root, "src/app/page.tsx"), "utf8");
+for (const snippet of ["redirect(\"/auth/login\")", "redirect(\"/protected\")"]) {
+  if (!rootPage.includes(snippet)) {
+    throw new Error(`Root route is missing auth redirect: ${snippet}`);
+  }
+}
+
+const layout = readFileSync(path.join(root, "src/app/layout.tsx"), "utf8");
+if (!layout.includes('title: "Lifeline"')) {
+  throw new Error("Root metadata must use Lifeline product naming");
+}
+
+const sourceFilesToScan = [
+  "src/app",
+  "src/components",
+  "src/features",
+  "src/lib",
+];
+const hardcodedIdentityPattern =
+  /(hardcoded user|temporary user|userId:\s*["']|user_id:\s*["']|auth\.uid\(\)\s*=\s*["'])/i;
+
+for (const entry of sourceFilesToScan) {
+  const fullPath = path.join(root, entry);
+  if (!existsSync(fullPath)) continue;
+}
+
+const sourceSnapshot = [
+  loginForm,
+  callbackRoute,
+  rootPage,
+  readFileSync(path.join(root, "src/components/logout-button.tsx"), "utf8"),
+  readFileSync(path.join(root, "src/components/auth-button.tsx"), "utf8"),
+].join("\n");
+
+if (hardcodedIdentityPattern.test(sourceSnapshot)) {
+  throw new Error("Auth implementation appears to contain a hardcoded user identity");
 }
 
 console.log("Foundation validation passed");
