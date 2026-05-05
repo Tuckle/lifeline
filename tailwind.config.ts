@@ -45,6 +45,32 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        focus: "hsl(var(--focus))",
+        timeline: "hsl(var(--timeline))",
+        memory: {
+          DEFAULT: "hsl(var(--memory))",
+          foreground: "hsl(var(--memory-foreground))",
+        },
+        reflection: {
+          DEFAULT: "hsl(var(--reflection))",
+          foreground: "hsl(var(--reflection-foreground))",
+        },
+        future: {
+          DEFAULT: "hsl(var(--future))",
+          foreground: "hsl(var(--future-foreground))",
+        },
+        imported: {
+          DEFAULT: "hsl(var(--imported))",
+          foreground: "hsl(var(--imported-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
         chart: {
           "1": "hsl(var(--chart-1))",
           "2": "hsl(var(--chart-2))",
@@ -57,6 +83,28 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        soft: "var(--radius-soft)",
+      },
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+        panel: "var(--shadow-panel)",
+      },
+      fontSize: {
+        "page-title": ["var(--text-page-title)", { lineHeight: "1.15" }],
+        "section-title": ["var(--text-section-title)", { lineHeight: "1.25" }],
+        body: ["var(--text-body)", { lineHeight: "1.5" }],
+        meta: ["var(--text-meta)", { lineHeight: "1.4" }],
+      },
+      lineHeight: {
+        reflective: "var(--leading-reflective)",
+      },
+      spacing: {
+        "lifeline-1": "calc(var(--space-unit) * 1)",
+        "lifeline-2": "calc(var(--space-unit) * 2)",
+        "lifeline-3": "calc(var(--space-unit) * 3)",
+        "lifeline-4": "calc(var(--space-unit) * 4)",
+        "lifeline-6": "calc(var(--space-unit) * 6)",
+        "lifeline-8": "calc(var(--space-unit) * 8)",
       },
     },
   },

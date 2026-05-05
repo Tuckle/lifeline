@@ -20,6 +20,10 @@ const requiredPaths = [
   "src/components/layout/workspace-shell.tsx",
   "src/components/layout/workspace-navigation.tsx",
   "src/components/ui",
+  "src/components/ui/alert.tsx",
+  "src/components/ui/dialog.tsx",
+  "src/components/ui/sheet.tsx",
+  "src/components/ui/sonner.tsx",
   "src/components/layout",
   "src/features/auth",
   "src/features/timeline",
@@ -47,6 +51,15 @@ const missingScripts = requiredScripts.filter((script) => !scripts[script]);
 
 if (missingScripts.length > 0) {
   throw new Error(`Missing package scripts: ${missingScripts.join(", ")}`);
+}
+
+for (const [dependency, expectedVersion] of Object.entries({
+  "@radix-ui/react-dialog": "1.1.15",
+  sonner: "2.0.7",
+})) {
+  if (packageJson.dependencies?.[dependency] !== expectedVersion) {
+    throw new Error(`${dependency} must be pinned to ${expectedVersion}`);
+  }
 }
 
 const envExample = readFileSync(path.join(root, ".env.example"), "utf8");
@@ -223,6 +236,69 @@ const layout = readFileSync(path.join(root, "src/app/layout.tsx"), "utf8");
 if (!layout.includes('title: "Lifeline"')) {
   throw new Error("Root metadata must use Lifeline product naming");
 }
+for (const snippet of ["Toaster", "richColors", "closeButton"]) {
+  if (!layout.includes(snippet)) {
+    throw new Error(`Root layout is missing toast provider setup: ${snippet}`);
+  }
+}
+
+const globalsCss = readFileSync(path.join(root, "src/app/globals.css"), "utf8");
+for (const snippet of [
+  "--background: 38 44% 96%",
+  "--foreground: 150 9% 13%",
+  "--timeline: 34 18% 66%",
+  "--memory: 18 43% 51%",
+  "--reflection: 258 22% 47%",
+  "--future: 204 42% 40%",
+  "--imported: 221 13% 46%",
+  "--warning: 36 71% 42%",
+  "--focus: 173 41% 31%",
+  "--space-unit: 0.5rem",
+  "--radius-soft",
+  "--shadow-soft",
+  "prefers-reduced-motion",
+  "letter-spacing: 0",
+]) {
+  if (!globalsCss.includes(snippet)) {
+    throw new Error(`Lifeline global design tokens are missing expected snippet: ${snippet}`);
+  }
+}
+
+const tailwindConfig = readFileSync(path.join(root, "tailwind.config.ts"), "utf8");
+for (const snippet of [
+  "focus: \"hsl(var(--focus))\"",
+  "timeline: \"hsl(var(--timeline))\"",
+  "memory:",
+  "reflection:",
+  "future:",
+  "imported:",
+  "warning:",
+  "success:",
+  "shadow-soft",
+  "text-page-title",
+  "lifeline-8",
+]) {
+  if (!tailwindConfig.includes(snippet)) {
+    throw new Error(`Tailwind config is missing Lifeline token mapping: ${snippet}`);
+  }
+}
+
+for (const [filePath, snippets] of Object.entries({
+  "src/components/ui/alert.tsx": ["Alert", "warning", "destructive", "role=\"status\""],
+  "src/components/ui/dialog.tsx": ["DialogPrimitive", "DialogContent", "shadow-panel", "sr-only"],
+  "src/components/ui/sheet.tsx": ["sheetVariants", "side:", "SheetContent", "min-h-11"],
+  "src/components/ui/sonner.tsx": ["Sonner", "toastOptions", "shadow-soft"],
+  "src/components/ui/button.tsx": ["min-h-11", "focus-visible:ring-2", "ring-focus"],
+  "src/components/ui/input.tsx": ["min-h-11", "focus-visible:ring-2", "ring-focus"],
+  "src/components/ui/checkbox.tsx": ["h-5 w-5", "focus-visible:ring-2", "ring-focus"],
+})) {
+  const file = readFileSync(path.join(root, filePath), "utf8");
+  for (const snippet of snippets) {
+    if (!file.includes(snippet)) {
+      throw new Error(`${filePath} is missing accessible primitive snippet: ${snippet}`);
+    }
+  }
+}
 
 const sourceFilesToScan = [
   "src/app",
@@ -250,6 +326,18 @@ const sourceSnapshot = [
 
 if (hardcodedIdentityPattern.test(sourceSnapshot)) {
   throw new Error("Auth implementation appears to contain a hardcoded user identity");
+}
+
+const visualSourceSnapshot = [
+  globalsCss,
+  tailwindConfig,
+  workspaceShell,
+  workspaceNavigation,
+  readFileSync(path.join(root, "src/components/ui/dropdown-menu.tsx"), "utf8"),
+].join("\n");
+
+if (/(text-\[[^\]]*(vw|vmin|vmax)|tracking-|letter-spacing:\s*-[0-9.])/i.test(visualSourceSnapshot)) {
+  throw new Error("Visual foundation should not use viewport-scaled font sizes or custom letter spacing");
 }
 
 console.log("Foundation validation passed");

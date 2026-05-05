@@ -58,7 +58,7 @@ export function WorkspaceShell({ children }: WorkspaceShellProps) {
         >
           <div className="sticky top-24 space-y-4">
             <div className="rounded-md border border-border bg-card p-4 text-card-foreground">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <p className="text-xs font-medium uppercase text-muted-foreground">
                 Clarity
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
