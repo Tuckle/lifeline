@@ -13,6 +13,7 @@ const requiredPaths = [
   "src/app",
   "src/app/(workspace)/timeline/page.tsx",
   "src/features/timeline/components/empty-memory-atlas-timeline.tsx",
+  "src/features/timeline/components/importance-control.tsx",
   "src/features/timeline/components/life-line-timeline.tsx",
   "src/features/timeline/components/memory-atlas-card.tsx",
   "src/features/timeline/queries/list-timeline-events.ts",
@@ -259,6 +260,7 @@ for (const snippet of [
   "LifeLineTimeline",
   "EmptyMemoryAtlasTimeline",
   "MemoryAtlasCard",
+  "getImportanceProminence",
   "Present",
   "Future space",
   "reachedInitialLimit",
@@ -275,6 +277,8 @@ const memoryAtlasCard = readFileSync(
 );
 for (const snippet of [
   "MemoryAtlasCard",
+  "getImportanceProminence",
+  "formatImportanceLabel",
   "Status:",
   "Importance:",
   "Date type:",
@@ -309,12 +313,32 @@ for (const snippet of [
   "Clear the URL to remove the photo reference",
   "Photo reference URL",
   "Photo description",
+  "ImportanceControl",
   "window.confirm",
   "submitEvent.preventDefault()",
   "Could not finish that change",
 ]) {
   if (!memoryDetailPanel.includes(snippet)) {
     throw new Error(`Memory detail panel is missing expected snippet: ${snippet}`);
+  }
+}
+
+const importanceControl = readFileSync(
+  path.join(root, "src/features/timeline/components/importance-control.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ImportanceControl",
+  "importanceDescriptions",
+  "I am not sure yet",
+  "Changed the line",
+  "type=\"radio\"",
+  "aria-label={`Importance:",
+  "getImportanceProminence",
+  "Defining memory",
+]) {
+  if (!importanceControl.includes(snippet)) {
+    throw new Error(`Importance control is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -412,6 +436,7 @@ for (const snippet of [
   "Photo reference URL",
   "Photo description",
   "uploads come",
+  "ImportanceControl",
   "min-h-11",
 ]) {
   if (!memoryCreationForm.includes(snippet)) {

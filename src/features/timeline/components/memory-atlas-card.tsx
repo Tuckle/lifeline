@@ -1,4 +1,8 @@
 import { Badge } from "@/components/ui/badge";
+import {
+  formatImportanceLabel,
+  getImportanceProminence,
+} from "@/features/timeline/components/importance-control";
 import { MemoryDetailPanel } from "@/features/timeline/components/memory-detail-panel";
 import type { TimelineEventSummary } from "@/features/timeline/types";
 
@@ -10,10 +14,11 @@ export function MemoryAtlasCard({ event }: MemoryAtlasCardProps) {
   const dateLabel =
     event.approximateDateLabel ?? event.occurredOn ?? "Date unknown for now";
   const preview = event.storyText ? getStoryPreview(event.storyText) : null;
+  const prominence = getImportanceProminence(event.importance);
 
   return (
     <article
-      className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-soft"
+      className={`rounded-md border bg-card p-4 text-card-foreground ${prominence.card}`}
       id={`memory-${event.id}`}
     >
       <div className="flex flex-wrap gap-2">
@@ -67,7 +72,10 @@ export function MemoryAtlasCard({ event }: MemoryAtlasCardProps) {
 
       <div className="mt-4 flex flex-wrap gap-2 text-sm">
         <span className="rounded-md border border-memory/30 bg-memory/10 px-2.5 py-1 text-foreground">
-          Importance: {event.importance}
+          Importance: {formatImportanceLabel(event.importance)}
+        </span>
+        <span className="rounded-md border border-primary/20 bg-primary/10 px-2.5 py-1 text-foreground">
+          {prominence.label}
         </span>
         <span className="rounded-md border border-timeline bg-background px-2.5 py-1 text-muted-foreground">
           Date type: {event.datePrecision}

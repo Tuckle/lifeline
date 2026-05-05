@@ -3,6 +3,7 @@ import { CalendarPlus, Milestone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EmptyMemoryAtlasTimeline } from "@/features/timeline/components/empty-memory-atlas-timeline";
+import { getImportanceProminence } from "@/features/timeline/components/importance-control";
 import { MemoryAtlasCard } from "@/features/timeline/components/memory-atlas-card";
 import type { TimelineEventSummary } from "@/features/timeline/types";
 
@@ -55,26 +56,30 @@ export function LifeLineTimeline({
         />
 
         <ol className="relative grid gap-5">
-          {events.map((event, index) => (
-            <li
-              className="relative grid gap-4 pl-14 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:pl-0"
-              key={event.id}
-            >
-              <div
-                aria-hidden="true"
-                className="absolute left-1 top-2 flex size-8 items-center justify-center rounded-full border-4 border-background bg-memory text-memory-foreground sm:left-1/2 sm:-translate-x-1/2"
+          {events.map((event, index) => {
+            const prominence = getImportanceProminence(event.importance);
+
+            return (
+              <li
+                className="relative grid gap-4 pl-14 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:pl-0"
+                key={event.id}
               >
-                <Milestone className="size-3.5" />
-              </div>
-              <div
-                className={
-                  index % 2 === 0 ? "sm:pr-10" : "sm:col-start-2 sm:pl-10"
-                }
-              >
-                <MemoryAtlasCard event={event} />
-              </div>
-            </li>
-          ))}
+                <div
+                  aria-label={prominence.label}
+                  className={`absolute left-0 top-2 flex items-center justify-center rounded-full border-4 border-background sm:left-1/2 sm:-translate-x-1/2 ${prominence.marker}`}
+                >
+                  <Milestone className="size-3.5" />
+                </div>
+                <div
+                  className={
+                    index % 2 === 0 ? "sm:pr-10" : "sm:col-start-2 sm:pl-10"
+                  }
+                >
+                  <MemoryAtlasCard event={event} />
+                </div>
+              </li>
+            );
+          })}
         </ol>
 
         <div className="relative mt-8 grid gap-4 pl-14 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:pl-0">

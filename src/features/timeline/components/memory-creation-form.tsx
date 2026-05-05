@@ -18,6 +18,7 @@ import {
   getDateLabel,
   importanceValues,
 } from "@/features/timeline/schemas/timeline-event-form";
+import { ImportanceControl } from "@/features/timeline/components/importance-control";
 
 const datePrecisionLabels = {
   exact: "Exact date",
@@ -25,14 +26,6 @@ const datePrecisionLabels = {
   year: "Year only",
   period: "Life period",
   unknown: "Unknown for now",
-};
-
-const importanceLabels = {
-  unset: "Unset",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  defining: "Defining",
 };
 
 export function MemoryCreationForm() {
@@ -198,29 +191,10 @@ export function MemoryCreationForm() {
             </FieldBlock>
           </div>
 
-          <fieldset className="grid gap-3">
-            <legend className="text-sm font-medium text-foreground">
-              Importance
-            </legend>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {importanceValues.map((importance) => (
-                <label
-                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-border bg-background/60 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-focus focus-within:ring-offset-2 focus-within:ring-offset-background"
-                  key={importance}
-                >
-                  <input
-                    checked={values.importance === importance}
-                    className="size-4 accent-primary"
-                    name="importance"
-                    onChange={() => updateValue("importance", importance)}
-                    type="radio"
-                    value={importance}
-                  />
-                  <span>{importanceLabels[importance]}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <ImportanceControl
+            onChange={(importance) => updateValue("importance", importance)}
+            value={values.importance}
+          />
 
           {state.result && !state.result.ok ? (
             <Alert variant="destructive">
