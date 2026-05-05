@@ -1,0 +1,2 @@
+-- Seed data intentionally omitted for the foundation story.
+-- Do not add private timeline, note, reflection, or import content here.

@@ -1,0 +1,1008 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lifeline UX Design Directions</title>
+  <style>
+    :root {
+      --bg: #faf7f2;
+      --surface: #ffffff;
+      --surface-muted: #f1ece4;
+      --text: #1f2522;
+      --muted: #5f6862;
+      --border: #d8d0c4;
+      --line: #b8aa98;
+      --teal: #2f6f68;
+      --clay: #b86b4b;
+      --plum: #6e5e93;
+      --blue: #3b6e8f;
+      --slate: #667085;
+      --warning: #b7791f;
+      --error: #b42318;
+      --shadow: 0 18px 50px rgba(31, 37, 34, 0.08);
+      --radius: 8px;
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+    }
+
+    .intro {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 48px 24px 24px;
+    }
+
+    .intro h1 {
+      margin: 0 0 12px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.05;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .intro p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      background: rgba(250, 247, 242, 0.9);
+      border-bottom: 1px solid rgba(216, 208, 196, 0.8);
+      backdrop-filter: blur(16px);
+    }
+
+    .toolbar a,
+    .toolbar button {
+      min-height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 13px;
+      cursor: pointer;
+    }
+
+    .toolbar a:hover,
+    .toolbar button:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    .direction {
+      min-height: 100vh;
+      padding: 64px 24px;
+      border-top: 1px solid rgba(216, 208, 196, 0.7);
+    }
+
+    .direction:nth-child(even) {
+      background: #fffdfa;
+    }
+
+    .direction-head {
+      max-width: 1160px;
+      margin: 0 auto 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+    }
+
+    .kicker {
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .direction h2 {
+      margin: 6px 0 8px;
+      font-size: clamp(28px, 3.2vw, 42px);
+      line-height: 1.1;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .direction-head p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      min-width: 300px;
+    }
+
+    .score span {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mock {
+      max-width: 1160px;
+      min-height: 680px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--teal);
+      border-radius: 999px;
+      position: relative;
+    }
+
+    .brand-mark:before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: -8px;
+      width: 2px;
+      height: 42px;
+      background: var(--teal);
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav span {
+      padding: 7px 10px;
+      border-radius: 999px;
+    }
+
+    .nav .active {
+      color: var(--teal);
+      background: #e6f0ed;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn,
+    .primary-btn,
+    .ghost-btn {
+      min-height: 38px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      padding: 8px 12px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      padding: 0;
+    }
+
+    .primary-btn {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: white;
+    }
+
+    .ghost-btn {
+      background: transparent;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 550;
+    }
+
+    .layout-studio {
+      display: grid;
+      grid-template-columns: 230px 1fr 320px;
+      min-height: 616px;
+    }
+
+    .side {
+      border-right: 1px solid var(--border);
+      background: #fbf9f5;
+      padding: 20px;
+    }
+
+    .side h3,
+    .panel h3,
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .side-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      min-height: 38px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .side-row.active {
+      color: var(--teal);
+      font-weight: 650;
+    }
+
+    .timeline-wrap {
+      position: relative;
+      padding: 34px 28px;
+      overflow: hidden;
+    }
+
+    .timeline-line {
+      position: absolute;
+      top: 24px;
+      bottom: 24px;
+      left: 50%;
+      width: 2px;
+      background: var(--line);
+      transform: translateX(-50%);
+    }
+
+    .present {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
+      width: 18px;
+      height: 18px;
+      border: 4px solid white;
+      border-radius: 999px;
+      background: var(--teal);
+      box-shadow: 0 0 0 2px var(--teal);
+      z-index: 2;
+    }
+
+    .event {
+      position: relative;
+      width: min(42%, 280px);
+      margin: 0 0 28px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 8px 22px rgba(31, 37, 34, 0.05);
+    }
+
+    .event:hover {
+      border-color: var(--teal);
+      transform: translateY(-1px);
+    }
+
+    .event.left {
+      margin-right: auto;
+    }
+
+    .event.right {
+      margin-left: auto;
+    }
+
+    .event .date {
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .event h4 {
+      margin: 5px 0 6px;
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    .event p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      margin-right: 6px;
+      background: var(--clay);
+    }
+
+    .dot.teal { background: var(--teal); }
+    .dot.plum { background: var(--plum); }
+    .dot.blue { background: var(--blue); }
+    .dot.slate { background: var(--slate); }
+
+    .panel {
+      border-left: 1px solid var(--border);
+      background: #fffdfa;
+      padding: 20px;
+    }
+
+    .panel-section {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-section p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .layout-journal {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      min-height: 616px;
+      background: #fffdfa;
+    }
+
+    .journal-page {
+      padding: 54px 72px;
+      max-width: 780px;
+    }
+
+    .journal-page h3 {
+      margin: 12px 0 16px;
+      font-size: 34px;
+      line-height: 1.15;
+      font-weight: 600;
+    }
+
+    .journal-copy {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      line-height: 1.65;
+      color: #2d322f;
+    }
+
+    .margin-rail {
+      position: relative;
+      border-left: 1px solid var(--border);
+      padding: 36px 24px;
+      background: var(--bg);
+    }
+
+    .mini-line {
+      position: absolute;
+      left: 32px;
+      top: 48px;
+      bottom: 48px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    .mini-item {
+      position: relative;
+      margin: 0 0 24px 26px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: white;
+      font-size: 13px;
+    }
+
+    .layout-pattern {
+      display: grid;
+      grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr);
+      min-height: 616px;
+      background: #f9f6f0;
+    }
+
+    .pattern-left,
+    .pattern-right {
+      padding: 28px;
+    }
+
+    .pattern-left {
+      border-right: 1px solid var(--border);
+    }
+
+    .card {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(31, 37, 34, 0.04);
+    }
+
+    .card + .card {
+      margin-top: 14px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .metric {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      color: var(--teal);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .layout-curation {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      min-height: 616px;
+    }
+
+    .queue {
+      padding: 20px;
+      border-right: 1px solid var(--border);
+      background: #fbf9f5;
+    }
+
+    .queue-item {
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: white;
+      margin-bottom: 10px;
+    }
+
+    .queue-item h4 {
+      margin: 7px 0;
+      font-size: 15px;
+    }
+
+    .queue-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .tiny-btn {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+      min-height: 28px;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .layout-atlas {
+      min-height: 616px;
+      padding: 28px;
+      background:
+        linear-gradient(rgba(250, 247, 242, 0.92), rgba(250, 247, 242, 0.92)),
+        radial-gradient(circle at 20% 20%, rgba(47, 111, 104, 0.18), transparent 32%),
+        radial-gradient(circle at 80% 12%, rgba(184, 107, 75, 0.14), transparent 30%);
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      height: 100%;
+    }
+
+    .photo-card {
+      min-height: 220px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: white;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .photo {
+      min-height: 190px;
+      background:
+        linear-gradient(135deg, rgba(47, 111, 104, 0.22), rgba(184, 107, 75, 0.24)),
+        repeating-linear-gradient(45deg, #ebe2d8 0 12px, #f6f0e8 12px 24px);
+    }
+
+    .photo.alt {
+      background:
+        linear-gradient(135deg, rgba(110, 94, 147, 0.2), rgba(59, 110, 143, 0.2)),
+        repeating-linear-gradient(-45deg, #e6e0ec 0 12px, #f4f1f7 12px 24px);
+    }
+
+    .photo-body {
+      padding: 16px;
+    }
+
+    .layout-future {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 616px;
+    }
+
+    .past-pane,
+    .future-pane {
+      padding: 32px;
+      position: relative;
+    }
+
+    .past-pane {
+      border-right: 1px solid var(--border);
+      background: #fffdfa;
+    }
+
+    .future-pane {
+      background: #f4f8f8;
+    }
+
+    .decision {
+      padding: 18px;
+      border: 1px solid rgba(47, 111, 104, 0.25);
+      border-radius: var(--radius);
+      background: white;
+      margin-top: 16px;
+    }
+
+    .decision h4 {
+      margin: 0 0 8px;
+      color: var(--teal);
+    }
+
+    .comparison {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 36px 24px 72px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-muted);
+      font-size: 13px;
+    }
+
+    td {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .direction-head,
+      .layout-studio,
+      .layout-journal,
+      .layout-pattern,
+      .layout-curation,
+      .layout-future,
+      .photo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .score {
+        min-width: 0;
+      }
+
+      .side,
+      .panel,
+      .pattern-left,
+      .queue,
+      .past-pane {
+        border-right: 0;
+        border-left: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .journal-page {
+        padding: 32px 24px;
+      }
+
+      .event {
+        width: calc(100% - 42px);
+        margin-left: 42px;
+      }
+
+      .timeline-line,
+      .present {
+        left: 26px;
+      }
+
+      .nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="intro">
+      <div class="kicker">Lifeline UX Design Directions</div>
+      <h1>Six ways Lifeline could feel.</h1>
+      <p>These mockups explore layout, density, visual hierarchy, and interaction emphasis for a private life reflection product. Each direction uses the same foundation: warm minimalism, clear privacy cues, a vertical life-line, and pattern discovery.</p>
+    </section>
+
+    <nav class="toolbar" aria-label="Design direction navigation">
+      <a href="#studio">1 Studio</a>
+      <a href="#journal">2 Journal</a>
+      <a href="#patterns">3 Patterns</a>
+      <a href="#curation">4 Curation</a>
+      <a href="#atlas">5 Atlas</a>
+      <a href="#future">6 Future</a>
+      <a href="#compare">Compare</a>
+      <button type="button" id="compactToggle">Toggle compact view</button>
+    </nav>
+
+    <section class="direction" id="studio" data-direction>
+      <div class="direction-head">
+        <div>
+          <div class="kicker">Direction 1</div>
+          <h2>Lifeline Studio</h2>
+          <p>A balanced app layout with predictable navigation, a central timeline, and a right-side detail panel. This is the strongest default for MVP because it combines clarity, trust, and room for the custom life-line experience.</p>
+        </div>
+        <div class="score">
+          <span>Density: Balanced</span>
+          <span>Best for: MVP core</span>
+          <span>Risk: Less poetic</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div class="brand"><span class="brand-mark"></span> Lifeline</div>
+          <div class="nav"><span class="active">Timeline</span><span>Imports</span><span>Reflect</span><span>Search</span></div>
+          <div class="actions"><button class="ghost-btn">Import</button><button class="primary-btn">Add memory</button></div>
+        </div>
+        <div class="layout-studio">
+          <aside class="side">
+            <h3>Life view</h3>
+            <div class="side-row active"><span>Full line</span><span>324</span></div>
+            <div class="side-row"><span>Important</span><span>28</span></div>
+            <div class="side-row"><span>Reflections</span><span>14</span></div>
+            <div class="side-row"><span>Future</span><span>9</span></div>
+            <div class="panel-section"></div>
+            <h3>Sources</h3>
+            <div class="side-row"><span>Manual</span><span>84</span></div>
+            <div class="side-row"><span>RescueTime</span><span>126</span></div>
+            <div class="side-row"><span>Notes</span><span>114</span></div>
+          </aside>
+          <section class="timeline-wrap" aria-label="Timeline preview">
+            <div class="timeline-line"></div>
+            <div class="present" title="Present"></div>
+            <article class="event left"><div class="date">Around 2014</div><h4><span class="dot"></span>Moved cities for university</h4><p>First time life split into before and after.</p></article>
+            <article class="event right"><div class="date">Nov 2019</div><h4><span class="dot slate"></span>Heavy focus period</h4><p>RescueTime suggests sustained late-night work.</p></article>
+            <article class="event left"><div class="date">May 2022</div><h4><span class="dot plum"></span>Pattern: isolation before change</h4><p>Reflection completed with one future intention.</p></article>
+            <article class="event right"><div class="date">Today</div><h4><span class="dot teal"></span>Present review</h4><p>3 staged notes may belong to this period.</p></article>
+            <article class="event left"><div class="date">Future</div><h4><span class="dot blue"></span>Build healthier work rhythm</h4><p>Connected to the May 2022 reflection.</p></article>
+          </section>
+          <aside class="panel">
+            <h3>Selected period</h3>
+            <div class="panel-section"><span class="chip">May 2022 to Aug 2022</span><p>Three important events, one reflection, and four imported notes cluster around a major work transition.</p></div>
+            <div class="panel-section"><h3>Possible pattern</h3><p>You often increase work intensity before making a major personal change.</p></div>
+            <div class="panel-section"><button class="primary-btn">Start reflection</button></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="direction" id="journal" data-direction>
+      <div class="direction-head">
+        <div>
+          <div class="kicker">Direction 2</div>
+          <h2>Reflective Journal</h2>
+          <p>A reading-first direction where memories and reflections feel spacious and almost editorial, with the timeline acting as a quiet navigation rail. Best for emotionally deep reflection sessions.</p>
+        </div>
+        <div class="score">
+          <span>Density: Spacious</span>
+          <span>Best for: Reflection</span>
+          <span>Risk: Slower scanning</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div class="brand"><span class="brand-mark"></span> Lifeline</div>
+          <div class="nav"><span>Timeline</span><span class="active">Reflect</span><span>Patterns</span></div>
+          <div class="actions"><button class="ghost-btn">Save draft</button><button class="primary-btn">Complete</button></div>
+        </div>
+        <div class="layout-journal">
+          <section class="journal-page">
+            <span class="chip">Reflection session</span>
+            <h3>The period when work became identity.</h3>
+            <p class="journal-copy">Looking across this period, the same shape repeats: intense work, less contact with friends, then a decision that creates relief. The timeline makes the pattern visible because the memories, notes, and activity data finally sit in the same place.</p>
+            <div class="metric-grid">
+              <div class="metric"><strong>4</strong><span>important memories</span></div>
+              <div class="metric"><strong>11</strong><span>source records</span></div>
+              <div class="metric"><strong>1</strong><span>future intention</span></div>
+            </div>
+            <button class="primary-btn">Turn insight into intention</button>
+          </section>
+          <aside class="margin-rail">
+            <div class="mini-line"></div>
+            <div class="mini-item"><span class="dot"></span>Moved apartment</div>
+            <div class="mini-item"><span class="dot slate"></span>Late-night work cluster</div>
+            <div class="mini-item"><span class="dot plum"></span>Named pattern</div>
+            <div class="mini-item"><span class="dot blue"></span>Future intention</div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="direction" id="patterns" data-direction>
+      <div class="direction-head">
+        <div>
+          <div class="kicker">Direction 3</div>
+          <h2>Pattern Map</h2>
+          <p>A pattern-first workspace where the timeline is used to support discovery. Good when the product wants to emphasize clarity, decisions, and transformation over archival memory.</p>
+        </div>
+        <div class="score">
+          <span>Density: Analytical</span>
+          <span>Best for: Insights</span>
+          <span>Risk: Too dashboard-like</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div class="brand"><span class="brand-mark"></span> Lifeline</div>
+          <div class="nav"><span>Timeline</span><span class="active">Patterns</span><span>Reflect</span></div>
+          <div class="actions"><button class="ghost-btn">Filter</button><button class="primary-btn">Review period</button></div>
+        </div>
+        <div class="layout-pattern">
+          <section class="pattern-left">
+            <span class="chip">Detected through reflection</span>
+            <h2>Work intensity often rises before major change.</h2>
+            <p>Based on manually named reflections and promoted context from RescueTime and notes. Lifeline suggests the connection, but you decide whether it is true.</p>
+            <div class="metric-grid">
+              <div class="metric"><strong>3</strong><span>periods</span></div>
+              <div class="metric"><strong>7</strong><span>memories</span></div>
+              <div class="metric"><strong>2</strong><span>decisions</span></div>
+            </div>
+            <div class="card"><h3>Decision linked to this pattern</h3><p>Protect two evenings per week before committing to a major project change.</p></div>
+          </section>
+          <section class="pattern-right">
+            <div class="card"><h3><span class="dot"></span>2019: intense work before leaving role</h3><p>4 staged records attached, 1 reflection completed.</p></div>
+            <div class="card"><h3><span class="dot plum"></span>2022: isolation before move</h3><p>Pattern named during a self-review session.</p></div>
+            <div class="card"><h3><span class="dot blue"></span>Future: change with support</h3><p>Intention created from the pattern.</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="direction" id="curation" data-direction>
+      <div class="direction-head">
+        <div>
+          <div class="kicker">Direction 4</div>
+          <h2>Curation Desk</h2>
+          <p>A clean utility layout for imports. It borrows Revolut-like clarity for sensitive data and makes source status, promotion, hiding, and deletion very explicit.</p>
+        </div>
+        <div class="score">
+          <span>Density: Efficient</span>
+          <span>Best for: Imports</span>
+          <span>Risk: Less emotional</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div class="brand"><span class="brand-mark"></span> Lifeline</div>
+          <div class="nav"><span>Timeline</span><span class="active">Imports</span><span>Settings</span></div>
+          <div class="actions"><button class="ghost-btn">Disconnect</button><button class="primary-btn">Import notes</button></div>
+        </div>
+        <div class="layout-curation">
+          <aside class="queue">
+            <h3>Staged context</h3>
+            <div class="queue-item"><span class="chip">RescueTime</span><h4>Late-night design work cluster</h4><p>May belong near "New project sprint".</p><div class="queue-actions"><button class="tiny-btn">Attach</button><button class="tiny-btn">Promote</button><button class="tiny-btn">Hide</button></div></div>
+            <div class="queue-item"><span class="chip">Notes</span><h4>"I need to change how I work"</h4><p>Possible reflection seed.</p><div class="queue-actions"><button class="tiny-btn">Attach</button><button class="tiny-btn">Promote</button><button class="tiny-btn">Discard</button></div></div>
+            <div class="queue-item"><span class="chip">Notes</span><h4>Old memory about school</h4><p>Approximate date needed.</p><div class="queue-actions"><button class="tiny-btn">Add date</button><button class="tiny-btn">Hide</button></div></div>
+          </aside>
+          <section class="timeline-wrap">
+            <div class="timeline-line"></div>
+            <div class="present"></div>
+            <article class="event left"><div class="date">May 2022</div><h4><span class="dot"></span>New project sprint</h4><p>2 import suggestions nearby.</p></article>
+            <article class="event right"><div class="date">Jun 2022</div><h4><span class="dot plum"></span>Reflection waiting</h4><p>Source notes suggest a pattern worth reviewing.</p></article>
+            <article class="event left"><div class="date">Future</div><h4><span class="dot blue"></span>Define healthier rhythm</h4><p>Create after reflection.</p></article>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="direction" id="atlas" data-direction>
+      <div class="direction-head">
+        <div>
+          <div class="kicker">Direction 5</div>
+          <h2>Memory Atlas</h2>
+          <p>A more emotional and media-led direction inspired by the satisfying visual rhythm of Instagram, but slower, private, and reflective. Best if photos and story fragments become central to product love.</p>
+        </div>
+        <div class="score">
+          <span>Density: Visual</span>
+          <span>Best for: Memories</span>
+          <span>Risk: Feed-like</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div class="brand"><span class="brand-mark"></span> Lifeline</div>
+          <div class="nav"><span class="active">Timeline</span><span>Albums</span><span>Reflect</span></div>
+          <div class="actions"><button class="ghost-btn">Add photo</button><button class="primary-btn">Add memory</button></div>
+        </div>
+        <div class="layout-atlas">
+          <div class="photo-grid">
+            <article class="photo-card">
+              <div class="photo"></div>
+              <div class="photo-body"><span class="chip">Around 2010</span><h3>The summer that still feels bright</h3><p>A memory with an approximate date, two photo references, and a later reflection.</p></div>
+            </article>
+            <div>
+              <article class="photo-card"><div class="photo alt"></div><div class="photo-body"><span class="chip">Reflection</span><h3>What this period taught me</h3><p>Named pattern: I felt most alive when building with friends.</p></div></article>
+              <article class="card"><h3><span class="dot blue"></span>Future intention</h3><p>Make space for one collaborative project this year.</p></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="direction" id="future" data-direction>
+      <div class="direction-head">
+        <div>
+          <div class="kicker">Direction 6</div>
+          <h2>Past to Future</h2>
+          <p>A decision-oriented layout that makes the product promise explicit: understand the past, then decide what changes. Best for self-improvement and reflective action.</p>
+        </div>
+        <div class="score">
+          <span>Density: Focused</span>
+          <span>Best for: Decisions</span>
+          <span>Risk: Less exploratory</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div class="brand"><span class="brand-mark"></span> Lifeline</div>
+          <div class="nav"><span>Timeline</span><span class="active">Review</span><span>Future</span></div>
+          <div class="actions"><button class="ghost-btn">Pause</button><button class="primary-btn">Save decision</button></div>
+        </div>
+        <div class="layout-future">
+          <section class="past-pane">
+            <span class="chip">Past pattern</span>
+            <h2>When pressure rises, connection drops.</h2>
+            <div class="card"><h3><span class="dot"></span>Evidence from memories</h3><p>Three important memories mention withdrawing before big changes.</p></div>
+            <div class="card"><h3><span class="dot slate"></span>Imported context</h3><p>Late-night work and fewer personal notes appear in the same periods.</p></div>
+          </section>
+          <section class="future-pane">
+            <span class="chip">Future intention</span>
+            <h2>Change the pattern before it repeats.</h2>
+            <div class="decision"><h4>Decision</h4><p>When a project enters crunch mode, schedule two check-ins with people I trust before making a major decision.</p></div>
+            <div class="decision"><h4>Connected reminder</h4><p>Review this intention in one month from the present marker.</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison" id="compare">
+      <div class="kicker">Comparison</div>
+      <h2>How to evaluate these directions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Direction</th>
+            <th>Strongest fit</th>
+            <th>What to borrow</th>
+            <th>Watch out for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1 Studio</td><td>MVP product shell and default timeline</td><td>Navigation, central line, detail panel, trust controls</td><td>Can feel too app-like if not warmed through content</td></tr>
+          <tr><td>2 Journal</td><td>Deep reflection sessions</td><td>Readable long-form surfaces, spacious completion flow</td><td>Can slow down import review and scanning</td></tr>
+          <tr><td>3 Patterns</td><td>Pattern discovery and clarity moments</td><td>Insight cards, evidence linking, decisions from patterns</td><td>Can drift into analytics if overused</td></tr>
+          <tr><td>4 Curation</td><td>RescueTime and notes import review</td><td>Explicit source states and safe data actions</td><td>Can feel utilitarian rather than emotional</td></tr>
+          <tr><td>5 Atlas</td><td>Photo-backed memories and emotional recall</td><td>Visual rhythm, media hierarchy, warm memory surfaces</td><td>Can become feed-like or visually noisy</td></tr>
+          <tr><td>6 Future</td><td>Turning insight into life decisions</td><td>Past-to-future relationship and intentional completion</td><td>Can feel too guided if every session pushes a decision</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const toggle = document.getElementById("compactToggle");
+    toggle.addEventListener("click", () => {
+      document.querySelectorAll("[data-direction]").forEach((section) => {
+        section.classList.toggle("hidden");
+      });
+      document.getElementById("compare").classList.toggle("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>

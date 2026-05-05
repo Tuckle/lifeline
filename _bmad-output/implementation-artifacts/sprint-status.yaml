@@ -1,0 +1,90 @@
+# generated: 2026-05-04T19:20:41+0300
+# last_updated: 2026-05-05T16:45:29+0300
+# project: lifeline
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: /Users/Tuckle/Projects/lifeline/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: "2026-05-04T19:20:41+0300"
+last_updated: "2026-05-05T16:45:29+0300"
+project: lifeline
+project_key: NOKEY
+tracking_system: file-system
+story_location: /Users/Tuckle/Projects/lifeline/_bmad-output/implementation-artifacts
+
+development_status:
+  epic-1: in-progress
+  1-1-initialize-authenticated-app-foundation: done
+  1-2-google-sign-in-and-sign-out: backlog
+  1-3-protected-private-workspace-routing: backlog
+  1-4-responsive-app-shell-navigation: backlog
+  1-5-baseline-accessible-ui-foundation: backlog
+  epic-1-retrospective: optional
+  epic-2: backlog
+  2-1-empty-memory-atlas-timeline: backlog
+  2-2-create-life-event-with-approximate-date: backlog
+  2-3-browse-timeline-with-present-anchor: backlog
+  2-4-memory-detail-edit-hide-and-delete: backlog
+  2-5-story-text-and-photo-references: backlog
+  2-6-importance-weighting: backlog
+  2-7-future-intentions-below-present: backlog
+  epic-2-retrospective: optional
+  epic-3: backlog
+  3-1-timeline-search-and-filters: backlog
+  3-2-select-and-review-a-life-period: backlog
+  3-3-reflection-session-drafting: backlog
+  3-4-record-insights-and-user-named-patterns: backlog
+  3-5-link-future-intentions-to-reflections-and-patterns: backlog
+  3-6-product-boundary-and-emotional-safety-language: backlog
+  epic-3-retrospective: optional
+  epic-4: backlog
+  4-1-import-review-staging-foundation: backlog
+  4-2-connect-and-import-rescuetime-data: backlog
+  4-3-import-notes-content: backlog
+  4-4-inspect-staged-import-records: backlog
+  4-5-promote-or-attach-imported-context: backlog
+  4-6-hide-discard-and-control-resurfaced-imports: backlog
+  4-7-import-error-recovery-and-support-path: backlog
+  epic-4-retrospective: optional
+  epic-5: backlog
+  5-1-create-offline-timeline-draft: backlog
+  5-2-edit-mandatory-draft-fields-offline: backlog
+  5-3-sync-drafts-when-connectivity-returns: backlog
+  5-4-failed-sync-and-conflict-recovery: backlog
+  epic-5-retrospective: optional
+  epic-6: backlog
+  6-1-privacy-and-data-settings: backlog
+  6-2-connected-source-permission-details: backlog
+  6-3-disconnect-import-source: backlog
+  6-4-delete-imported-data: backlog
+  6-5-export-timeline-data: backlog
+  epic-6-retrospective: optional
