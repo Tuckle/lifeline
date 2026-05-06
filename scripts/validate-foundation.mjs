@@ -30,6 +30,11 @@ const requiredPaths = [
   "src/features/reviews/actions/save-reflection-session.ts",
   "src/features/reviews/schemas/reflection-pattern-form.ts",
   "src/features/reviews/schemas/reflection-session-form.ts",
+  "src/features/imports/components/import-review-surface.tsx",
+  "src/features/imports/components/import-staging-card.tsx",
+  "src/features/imports/queries/list-import-review.ts",
+  "src/features/imports/logger.ts",
+  "src/features/imports/types.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
@@ -70,6 +75,7 @@ const requiredPaths = [
   "supabase/migrations/20260506102400_create_review_sessions.sql",
   "supabase/migrations/20260506103600_create_reflection_patterns.sql",
   "supabase/migrations/20260506104900_create_future_intention_links.sql",
+  "supabase/migrations/20260506104700_create_import_staging.sql",
   "supabase/migrations",
 ];
 
@@ -514,6 +520,130 @@ for (const snippet of [
   if (!futureIntentionCard.includes(snippet)) {
     throw new Error(`Future intention card is missing expected snippet: ${snippet}`);
   }
+}
+
+const importsPage = readFileSync(
+  path.join(root, "src/app/(workspace)/imports/page.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "requireWorkspaceUser(\"/imports\")",
+  "listImportReview",
+  "ImportReviewSurface",
+]) {
+  if (!importsPage.includes(snippet)) {
+    throw new Error(`Imports page is missing expected snippet: ${snippet}`);
+  }
+}
+
+const importReviewQuery = readFileSync(
+  path.join(root, "src/features/imports/queries/list-import-review.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "listImportReview",
+  "IMPORT_REVIEW_RECORD_LIMIT = 100",
+  "supabase.auth.getClaims",
+  ".from(\"import_sources\")",
+  ".from(\"import_records\")",
+  "lifecycle_state",
+  "sync_status",
+  "source_metadata",
+  "content_summary",
+  ".neq(\"lifecycle_state\", \"deleted\")",
+  "ErrorCodes.importAuthFailed",
+  "logImportError",
+]) {
+  if (!importReviewQuery.includes(snippet)) {
+    throw new Error(`Import review query is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/\.from\(\"timeline_events\"\)/.test(importReviewQuery)) {
+  throw new Error("Import review query must not load primary timeline events");
+}
+
+const importReviewSurface = readFileSync(
+  path.join(root, "src/features/imports/components/import-review-surface.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ImportReviewSurface",
+  "Review imports before they touch your life-line",
+  "Staged suggested context",
+  "Nothing becomes a primary timeline memory automatically",
+  "Connect RescueTime",
+  "Import notes",
+  "ImportStagingCard",
+  "No staged imports yet",
+]) {
+  if (!importReviewSurface.includes(snippet)) {
+    throw new Error(`Import review surface is missing expected snippet: ${snippet}`);
+  }
+}
+
+const importStagingCard = readFileSync(
+  path.join(root, "src/features/imports/components/import-staging-card.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ImportStagingCard",
+  "Lifecycle:",
+  "Sync:",
+  "Source details",
+  "Attach",
+  "Promote",
+  "Reflect",
+  "Hide",
+  "Discard",
+  "Curation actions will be enabled",
+]) {
+  if (!importStagingCard.includes(snippet)) {
+    throw new Error(`Import staging card is missing expected snippet: ${snippet}`);
+  }
+}
+
+const importTypes = readFileSync(
+  path.join(root, "src/features/imports/types.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "ImportSourceSummary",
+  "ImportRecordSummary",
+  "\"staged\"",
+  "\"attached\"",
+  "\"promoted\"",
+  "\"hidden\"",
+  "\"discarded\"",
+  "\"deleted\"",
+  "\"pending\"",
+  "\"succeeded\"",
+  "\"partial\"",
+  "\"failed\"",
+  "\"duplicate\"",
+]) {
+  if (!importTypes.includes(snippet)) {
+    throw new Error(`Import types are missing expected snippet: ${snippet}`);
+  }
+}
+
+const importLogger = readFileSync(
+  path.join(root, "src/features/imports/logger.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "logImportError",
+  "ErrorCodes",
+  "technicalContext",
+  "console.error(\"import_error\"",
+]) {
+  if (!importLogger.includes(snippet)) {
+    throw new Error(`Import logger is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/(content|summary|note|activity)/i.test(importLogger.replace("technicalContext", ""))) {
+  throw new Error("Import logger must not accept sensitive imported content fields");
 }
 
 const timelineSearchPanel = readFileSync(
@@ -1107,6 +1237,42 @@ for (const snippet of [
   if (!futureIntentionLinksMigration.includes(snippet)) {
     throw new Error(`Future intention links migration is missing expected snippet: ${snippet}`);
   }
+}
+
+const importStagingMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260506104700_create_import_staging.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "create table if not exists public.import_sources",
+  "create table if not exists public.import_records",
+  "user_id uuid not null references auth.users(id) on delete cascade",
+  "source_type text not null check (source_type in ('rescuetime', 'notes'))",
+  "connection_status text not null default 'not_connected'",
+  "source_metadata jsonb not null default '{}'::jsonb",
+  "content_summary text not null",
+  "lifecycle_state text not null default 'staged'",
+  "lifecycle_state in ('staged', 'attached', 'promoted', 'hidden', 'discarded', 'deleted')",
+  "sync_status text not null default 'succeeded'",
+  "sync_status in ('pending', 'succeeded', 'partial', 'failed', 'duplicate')",
+  "alter table public.import_sources enable row level security",
+  "alter table public.import_records enable row level security",
+  "import_sources_select_own",
+  "import_sources_insert_own",
+  "import_sources_update_own",
+  "import_sources_delete_own",
+  "import_records_select_own",
+  "import_records_insert_own",
+  "import_records_update_own",
+  "import_records_delete_own",
+]) {
+  if (!importStagingMigration.includes(snippet)) {
+    throw new Error(`Import staging migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/insert\s+into\s+public\.timeline_events/i.test(importStagingMigration)) {
+  throw new Error("Import staging migration must not create primary timeline events");
 }
 
 const publicSourceSnapshot = [

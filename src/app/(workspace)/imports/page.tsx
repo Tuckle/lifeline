@@ -1,5 +1,6 @@
-import { WorkspacePlaceholder } from "@/components/layout/workspace-placeholder";
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
+import { ImportReviewSurface } from "@/features/imports/components/import-review-surface";
+import { listImportReview } from "@/features/imports/queries/list-import-review";
 import { Suspense } from "react";
 
 export default function ImportsPage() {
@@ -12,11 +13,17 @@ export default function ImportsPage() {
 
 async function ImportsContent() {
   await requireWorkspaceUser("/imports");
+  const importReview = await listImportReview();
 
-  return (
-    <WorkspacePlaceholder
-      title="Imports"
-      description="Staged RescueTime and notes context will be reviewed here once import stories add data."
-    />
-  );
+  if (!importReview.ok) {
+    return (
+      <ImportReviewSurface
+        hasConnectedSources={false}
+        records={[]}
+        sources={[]}
+      />
+    );
+  }
+
+  return <ImportReviewSurface {...importReview.data} />;
 }
