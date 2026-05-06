@@ -56,6 +56,7 @@ const requiredPaths = [
   "src/features/timeline/components/memory-detail-panel.tsx",
   "src/features/timeline/schemas/timeline-event-form.ts",
   "src/features/timeline/schemas/future-intention-form.ts",
+  "src/features/offline/actions/sync-offline-draft.ts",
   "src/features/offline/components/offline-memory-draft-panel.tsx",
   "src/app/(workspace)/imports/page.tsx",
   "src/app/(workspace)/reflect/page.tsx",
@@ -346,6 +347,15 @@ for (const snippet of [
   "Full enrichment, media upload, import sync, and reflection sync require",
   "Edit mandatory fields",
   "Save local changes",
+  "syncOfflineDraftAction",
+  "initialOfflineDraftSyncState",
+  "OfflineDraftSyncControl",
+  "Sync local draft",
+  "Sync pending...",
+  "Timeline event created",
+  "source metadata to avoid duplicate events",
+  "one failed draft does not block the others",
+  "Connect to the internet before syncing",
   "validateDraftFields",
   "draftErrors",
   "setDraftEdits",
@@ -359,6 +369,31 @@ for (const snippet of [
 
 if (/from\(\"timeline_events\"\)|createTimelineEventAction|importNotesAction|importRescueTimeAction|saveReflectionSessionAction/i.test(offlineMemoryDraftPanel)) {
   throw new Error("Offline memory drafts must stay local-only in Story 5.1");
+}
+
+const syncOfflineDraftAction = readFileSync(
+  path.join(root, "src/features/offline/actions/sync-offline-draft.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "syncOfflineDraftAction",
+  "ActionResult",
+  "timelineEventFormSchema.safeParse",
+  "supabase.auth.getClaims",
+  ".from(\"timeline_events\")",
+  ".eq(\"user_id\", userId)",
+  ".contains(\"source_metadata\", { offlineDraftId: draftId })",
+  "source_label: \"Offline draft\"",
+  "source_metadata",
+  "offlineDraftId",
+  "syncedFrom: \"localStorage\"",
+  "revalidatePath(\"/timeline\")",
+  "revalidatePath(\"/add\")",
+]) {
+  if (!syncOfflineDraftAction.includes(snippet)) {
+    throw new Error(`Offline draft sync action is missing expected snippet: ${snippet}`);
+  }
 }
 
 const listTimelineEventsQuery = readFileSync(

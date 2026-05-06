@@ -1,5 +1,5 @@
 # generated: 2026-05-04T19:20:41+0300
-# last_updated: 2026-05-06T19:00:34+0300
+# last_updated: 2026-05-06T22:21:58+0300
 # project: lifeline
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: "2026-05-04T19:20:41+0300"
-last_updated: "2026-05-06T19:00:34+0300"
+last_updated: "2026-05-06T22:21:58+0300"
 project: lifeline
 project_key: NOKEY
 tracking_system: file-system
@@ -78,7 +78,7 @@ development_status:
   epic-5: in-progress
   5-1-create-offline-timeline-draft: done
   5-2-edit-mandatory-draft-fields-offline: done
-  5-3-sync-drafts-when-connectivity-returns: backlog
+  5-3-sync-drafts-when-connectivity-returns: done
   5-4-failed-sync-and-conflict-recovery: backlog
   epic-5-retrospective: optional
   epic-6: backlog

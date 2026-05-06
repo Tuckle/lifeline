@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { HardDrive, Save, Trash2 } from "lucide-react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { HardDrive, Save, Send, Trash2 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  initialOfflineDraftSyncState,
+  syncOfflineDraftAction,
+} from "@/features/offline/actions/sync-offline-draft";
 
 const OFFLINE_MEMORY_DRAFTS_KEY = "lifeline:offline-memory-drafts";
 
@@ -129,6 +133,19 @@ export function OfflineMemoryDraftPanel() {
       setDraftEdits((current) => ({ ...current, [id]: undefined }));
     } catch {
       setError("This draft could not be removed locally yet. Try again.");
+    }
+  }
+
+  function updateDraftSyncStatus(id: string, syncStatus: OfflineSyncStatus) {
+    const nextDrafts = drafts.map((draft) =>
+      draft.id === id ? { ...draft, syncStatus } : draft,
+    );
+
+    try {
+      saveOfflineDrafts(nextDrafts);
+      setDrafts(nextDrafts);
+    } catch {
+      setError("This draft synced, but the local status could not be updated.");
     }
   }
 
@@ -296,8 +313,8 @@ export function OfflineMemoryDraftPanel() {
         </p>
         <div className="rounded-md border border-border bg-background p-3 text-sm leading-6 text-muted-foreground">
           Shared offline labels: Local only, Sync pending, Synced, Conflict, and
-          Failed. Story 5.2 keeps drafts local only until sync stories add server
-          behavior.
+          Failed. When connectivity returns, sync each draft independently so
+          one failed draft does not block the others.
         </div>
         {drafts.length > 0 ? (
           drafts.map((draft) => {
@@ -446,6 +463,11 @@ export function OfflineMemoryDraftPanel() {
                   <Trash2 aria-hidden="true" className="size-4" />
                   Remove local draft
                 </Button>
+                <OfflineDraftSyncControl
+                  draft={draft}
+                  isOnline={isOnline}
+                  onStatusChange={updateDraftSyncStatus}
+                />
               </article>
             );
           })
@@ -456,6 +478,76 @@ export function OfflineMemoryDraftPanel() {
         )}
       </div>
     </section>
+  );
+}
+
+function OfflineDraftSyncControl({
+  draft,
+  isOnline,
+  onStatusChange,
+}: {
+  draft: OfflineDraft;
+  isOnline: boolean;
+  onStatusChange: (id: string, status: OfflineSyncStatus) => void;
+}) {
+  const [state, action, isPending] = useActionState(
+    syncOfflineDraftAction,
+    initialOfflineDraftSyncState,
+  );
+  const handledResult = useRef<typeof state.result>(undefined);
+  const result = state.result;
+
+  useEffect(() => {
+    if (!result || handledResult.current === result) return;
+
+    handledResult.current = result;
+    onStatusChange(draft.id, result.ok ? "synced" : "failed");
+  }, [draft.id, onStatusChange, result]);
+
+  const currentStatus = isPending ? "sync_pending" : draft.syncStatus;
+
+  return (
+    <div className="mt-3 rounded-md border border-border bg-card p-3">
+      <div className="flex flex-wrap gap-2">
+        <Badge variant="outline">{offlineStatusLabels[currentStatus]}</Badge>
+        {result?.ok ? <Badge variant="outline">Timeline event created</Badge> : null}
+      </div>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        Sync creates a normal private timeline event for this signed-in account.
+        The draft identity is saved as source metadata to avoid duplicate events
+        when possible.
+      </p>
+      <form action={action} className="mt-3">
+        <input name="draftId" type="hidden" value={draft.id} />
+        <input name="title" type="hidden" value={draft.title} />
+        <input name="datePrecision" type="hidden" value={draft.datePrecision} />
+        <input name="exactDate" type="hidden" value={draft.exactDate} />
+        <input name="periodLabel" type="hidden" value={draft.periodLabel} />
+        <Button
+          disabled={!isOnline || isPending || draft.syncStatus === "synced"}
+          type="submit"
+          variant="outline"
+        >
+          <Send aria-hidden="true" className="size-4" />
+          {isPending ? "Sync pending..." : "Sync local draft"}
+        </Button>
+      </form>
+      {!isOnline ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          Connect to the internet before syncing this local draft.
+        </p>
+      ) : null}
+      {result && !result.ok ? (
+        <p className="mt-2 text-sm text-destructive" role="alert">
+          {result.error.message}
+        </p>
+      ) : null}
+      {result?.ok ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          Synced. It will appear on the timeline in the correct date position.
+        </p>
+      ) : null}
+    </div>
   );
 }
 
