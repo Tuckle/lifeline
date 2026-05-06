@@ -69,7 +69,7 @@ export async function listImportReview(): Promise<
       .select(
         "id,source_id,source_type,source_label,content_summary,source_metadata,occurred_at,period_started_at,period_ended_at,imported_at,lifecycle_state,sync_status,suggested_date_label,suggested_timeline_event_id",
       )
-      .neq("lifecycle_state", "deleted")
+      .not("lifecycle_state", "in", "(deleted,hidden,discarded)")
       .order("imported_at", { ascending: false })
       .limit(IMPORT_REVIEW_RECORD_LIMIT),
     supabase

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { LinkIcon, Sparkles } from "lucide-react";
+import { ArchiveX, CircleSlash, LinkIcon, Sparkles } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   attachImportRecordAction,
+  discardImportRecordAction,
+  hideImportRecordAction,
   initialImportCurationState,
   promoteImportRecordAction,
 } from "@/features/imports/actions/curate-import-record";
@@ -32,6 +34,14 @@ export function ImportRecordCurationActions({
   );
   const [attachState, attachAction, isAttaching] = useActionState(
     attachImportRecordAction,
+    initialImportCurationState,
+  );
+  const [hideState, hideAction, isHiding] = useActionState(
+    hideImportRecordAction,
+    initialImportCurationState,
+  );
+  const [discardState, discardAction, isDiscarding] = useActionState(
+    discardImportRecordAction,
     initialImportCurationState,
   );
   const defaultDate = record.occurredAt?.slice(0, 10) ?? "";
@@ -132,6 +142,42 @@ export function ImportRecordCurationActions({
         </form>
         <CurationResultAlert result={attachState.result} />
       </details>
+
+      <div className="rounded-md border border-border bg-background p-3">
+        <p className="text-sm font-medium text-foreground">Control resurfacing</p>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          Hide keeps the record out of normal suggestions. Discard marks it as
+          not useful for review without deleting the source metadata.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <form action={hideAction}>
+            <input name="recordId" type="hidden" value={record.id} />
+            <Button disabled={!canCurate || isHiding} type="submit" variant="outline">
+              <CircleSlash aria-hidden="true" className="size-4" />
+              {isHiding ? "Hiding..." : "Hide"}
+            </Button>
+          </form>
+          <form
+            action={discardAction}
+            onSubmit={(event) => {
+              if (
+                !window.confirm(
+                  "Discard this imported record from normal review? It will not be promoted or attached.",
+                )
+              ) {
+                event.preventDefault();
+              }
+            }}
+          >
+            <input name="recordId" type="hidden" value={record.id} />
+            <Button disabled={!canCurate || isDiscarding} type="submit" variant="outline">
+              <ArchiveX aria-hidden="true" className="size-4" />
+              {isDiscarding ? "Discarding..." : "Discard"}
+            </Button>
+          </form>
+        </div>
+        <CurationResultAlert result={hideState.result ?? discardState.result} />
+      </div>
     </div>
   );
 }

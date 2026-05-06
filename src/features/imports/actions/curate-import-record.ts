@@ -154,6 +154,36 @@ export async function attachImportRecordAction(
   };
 }
 
+export async function hideImportRecordAction(
+  _previousState: ImportCurationState,
+  formData: FormData,
+): Promise<ImportCurationState> {
+  const recordId = String(formData.get("recordId") ?? "");
+  const record = await loadImportRecord(recordId);
+  if (!record.ok) return { result: record };
+
+  const update = await setImportRecordLifecycle(recordId, "hidden");
+  if (!update.ok) return { result: update };
+
+  revalidatePath("/imports");
+  return { result: { ok: true, data: { id: recordId } } };
+}
+
+export async function discardImportRecordAction(
+  _previousState: ImportCurationState,
+  formData: FormData,
+): Promise<ImportCurationState> {
+  const recordId = String(formData.get("recordId") ?? "");
+  const record = await loadImportRecord(recordId);
+  if (!record.ok) return { result: record };
+
+  const update = await setImportRecordLifecycle(recordId, "discarded");
+  if (!update.ok) return { result: update };
+
+  revalidatePath("/imports");
+  return { result: { ok: true, data: { id: recordId } } };
+}
+
 async function loadImportRecord(
   recordId: string,
 ): Promise<ActionResult<ImportRecordRow>> {
@@ -189,15 +219,15 @@ async function loadImportRecord(
 
 async function setImportRecordLifecycle(
   recordId: string,
-  lifecycleState: "attached" | "promoted",
-  timelineEventId: string,
+  lifecycleState: "attached" | "discarded" | "hidden" | "promoted",
+  timelineEventId?: string,
 ): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
   const { error } = await supabase
     .from("import_records")
     .update({
       lifecycle_state: lifecycleState,
-      suggested_timeline_event_id: timelineEventId,
+      ...(timelineEventId ? { suggested_timeline_event_id: timelineEventId } : {}),
     })
     .eq("id", recordId)
     .eq("lifecycle_state", "staged");

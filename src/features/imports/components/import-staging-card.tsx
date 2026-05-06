@@ -1,4 +1,4 @@
-import { ArchiveX, CircleSlash, PenLine } from "lucide-react";
+import { PenLine } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -109,14 +109,6 @@ export function ImportStagingCard({
         <Button disabled variant="outline">
           <PenLine aria-hidden="true" className="size-4" />
           Reflect
-        </Button>
-        <Button disabled variant="outline">
-          <CircleSlash aria-hidden="true" className="size-4" />
-          Hide
-        </Button>
-        <Button disabled variant="outline">
-          <ArchiveX aria-hidden="true" className="size-4" />
-          Discard
         </Button>
       </div>
       <p className="mt-3 text-sm text-muted-foreground">
