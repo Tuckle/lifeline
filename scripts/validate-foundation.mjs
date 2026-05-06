@@ -77,6 +77,8 @@ const requiredPaths = [
   "src/features/imports",
   "src/features/reviews",
   "src/features/settings",
+  "src/features/settings/components/privacy-data-section.tsx",
+  "src/features/settings/queries/get-privacy-data-summary.ts",
   "src/features/offline",
   "src/app/auth/callback/route.ts",
   "src/features/auth/require-workspace-user.ts",
@@ -254,6 +256,64 @@ if (!workspaceLayout.includes("<WorkspaceShell>{children}</WorkspaceShell>")) {
 const protectedPage = readFileSync(path.join(root, "src/app/protected/page.tsx"), "utf8");
 if (!protectedPage.includes('redirect("/timeline")')) {
   throw new Error("/protected should redirect to the Timeline workspace home");
+}
+
+const settingsPage = readFileSync(
+  path.join(root, "src/app/(workspace)/settings/page.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "requireWorkspaceUser(\"/settings\")",
+  "getPrivacyDataSummary",
+  "PrivacyDataSection",
+  "ProductBoundaryNote",
+]) {
+  if (!settingsPage.includes(snippet)) {
+    throw new Error(`Settings page is missing expected privacy integration: ${snippet}`);
+  }
+}
+
+const privacyDataSummaryQuery = readFileSync(
+  path.join(root, "src/features/settings/queries/get-privacy-data-summary.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "getPrivacyDataSummary",
+  "ActionResult<PrivacyDataSummary>",
+  "supabase.auth.getClaims",
+  ".from(\"import_sources\")",
+  ".from(\"import_records\")",
+  ".from(\"timeline_events\")",
+  ".eq(\"user_id\", userId)",
+  "settingsLoadFailed",
+  "hasConnectedSources",
+]) {
+  if (!privacyDataSummaryQuery.includes(snippet)) {
+    throw new Error(`Privacy data summary query is missing expected snippet: ${snippet}`);
+  }
+}
+
+const privacyDataSection = readFileSync(
+  path.join(root, "src/features/settings/components/privacy-data-section.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "PrivacyDataSection",
+  "Privacy and Data",
+  "Private workspace",
+  "Connected sources",
+  "Source permissions",
+  "Disconnect source",
+  "Delete imported data",
+  "Export data",
+  "No connected sources",
+  "Review sources",
+  "Review deletion",
+  "Manual memories remain separate",
+]) {
+  if (!privacyDataSection.includes(snippet)) {
+    throw new Error(`Privacy data section is missing expected snippet: ${snippet}`);
+  }
 }
 
 const timelinePage = readFileSync(
@@ -1704,7 +1764,8 @@ if (/public\/.*(photo|memory|timeline)|NEXT_PUBLIC_.*(photo|media|storage)/i.tes
 }
 
 const productCopySnapshot = [
-  readFileSync(path.join(root, "src/app/(workspace)/settings/page.tsx"), "utf8"),
+  settingsPage,
+  privacyDataSection,
   periodReviewSurface,
   patternClarityPanel,
   reflectionSessionForm,

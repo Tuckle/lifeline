@@ -13,6 +13,7 @@ export const ErrorCodes = {
   importAuthFailed: "import_auth_failed",
   importCurationFailed: "import_curation_failed",
   offlineConflict: "offline_conflict",
+  settingsLoadFailed: "settings_load_failed",
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
