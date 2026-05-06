@@ -1,21 +1,22 @@
-import {
-  ArchiveX,
-  CircleSlash,
-  GitBranchPlus,
-  LinkIcon,
-  PenLine,
-  Sparkles,
-} from "lucide-react";
+import { ArchiveX, CircleSlash, PenLine } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { ImportRecordSummary } from "@/features/imports/types";
+import { ImportRecordCurationActions } from "@/features/imports/components/import-record-curation-actions";
+import type {
+  ImportAttachTimelineEventOption,
+  ImportRecordSummary,
+} from "@/features/imports/types";
 
 type ImportStagingCardProps = {
   record: ImportRecordSummary;
+  timelineOptions: ImportAttachTimelineEventOption[];
 };
 
-export function ImportStagingCard({ record }: ImportStagingCardProps) {
+export function ImportStagingCard({
+  record,
+  timelineOptions,
+}: ImportStagingCardProps) {
   return (
     <article className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-soft">
       <div className="flex flex-wrap items-center gap-2">
@@ -99,15 +100,12 @@ export function ImportStagingCard({ record }: ImportStagingCardProps) {
         </dl>
       </details>
 
+      <ImportRecordCurationActions
+        record={record}
+        timelineOptions={timelineOptions}
+      />
+
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button disabled variant="outline">
-          <LinkIcon aria-hidden="true" className="size-4" />
-          Attach
-        </Button>
-        <Button disabled variant="outline">
-          <Sparkles aria-hidden="true" className="size-4" />
-          Promote
-        </Button>
         <Button disabled variant="outline">
           <PenLine aria-hidden="true" className="size-4" />
           Reflect

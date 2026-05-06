@@ -48,3 +48,9 @@ export type ImportRecordSummary = {
   suggestedDateLabel: string | null;
   suggestedTimelineEventId: string | null;
 };
+
+export type ImportAttachTimelineEventOption = {
+  id: string;
+  title: string;
+  dateLabel: string | null;
+};

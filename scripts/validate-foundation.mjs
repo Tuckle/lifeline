@@ -32,8 +32,10 @@ const requiredPaths = [
   "src/features/reviews/schemas/reflection-session-form.ts",
   "src/features/imports/components/import-review-surface.tsx",
   "src/features/imports/components/import-staging-card.tsx",
+  "src/features/imports/components/import-record-curation-actions.tsx",
   "src/features/imports/components/notes-import-panel.tsx",
   "src/features/imports/components/rescuetime-connect-panel.tsx",
+  "src/features/imports/actions/curate-import-record.ts",
   "src/features/imports/actions/notes-import.ts",
   "src/features/imports/actions/rescuetime-import.ts",
   "src/features/imports/notes/parse-notes-export.ts",
@@ -83,6 +85,7 @@ const requiredPaths = [
   "supabase/migrations/20260506104900_create_future_intention_links.sql",
   "supabase/migrations/20260506104700_create_import_staging.sql",
   "supabase/migrations/20260506105300_add_rescuetime_import_dedupe.sql",
+  "supabase/migrations/20260506154500_add_import_promotion_metadata.sql",
   "supabase/migrations",
 ];
 
@@ -561,6 +564,8 @@ for (const snippet of [
   "sync_status",
   "source_metadata",
   "content_summary",
+  "timelineOptions",
+  ".from(\"timeline_events\")",
   ".neq(\"lifecycle_state\", \"deleted\")",
   "ErrorCodes.importAuthFailed",
   "logImportError",
@@ -568,10 +573,6 @@ for (const snippet of [
   if (!importReviewQuery.includes(snippet)) {
     throw new Error(`Import review query is missing expected snippet: ${snippet}`);
   }
-}
-
-if (/\.from\(\"timeline_events\"\)/.test(importReviewQuery)) {
-  throw new Error("Import review query must not load primary timeline events");
 }
 
 const importReviewSurface = readFileSync(
@@ -610,6 +611,7 @@ for (const snippet of [
   "Date placement",
   "Source timestamp",
   "Privacy consequence",
+  "ImportRecordCurationActions",
   "getLifecycleExplanation",
   "getSyncGuidance",
   "successful records remain usable",
@@ -624,6 +626,53 @@ for (const snippet of [
 ]) {
   if (!importStagingCard.includes(snippet)) {
     throw new Error(`Import staging card is missing expected snippet: ${snippet}`);
+  }
+}
+
+const importRecordCurationActions = readFileSync(
+  path.join(root, "src/features/imports/components/import-record-curation-actions.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ImportRecordCurationActions",
+  "promoteImportRecordAction",
+  "attachImportRecordAction",
+  "Promote to timeline",
+  "Attach to existing memory",
+  "Exact date",
+  "Approximate period",
+  "Import stayed staged",
+  "timelineOptions",
+]) {
+  if (!importRecordCurationActions.includes(snippet)) {
+    throw new Error(`Import record curation actions are missing expected snippet: ${snippet}`);
+  }
+}
+
+const curateImportRecordAction = readFileSync(
+  path.join(root, "src/features/imports/actions/curate-import-record.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "promoteImportRecordAction",
+  "attachImportRecordAction",
+  ".from(\"timeline_events\")",
+  ".from(\"import_records\")",
+  "source_type: \"imported\"",
+  "source_import_record_id",
+  "source_metadata: record.data.source_metadata",
+  "lifecycle_state",
+  "\"promoted\"",
+  "\"attached\"",
+  "suggested_timeline_event_id",
+  "Choose an exact date or name an approximate period before promoting",
+  "It is still staged, so you can retry",
+  "revalidatePath(\"/imports\")",
+  "revalidatePath(\"/timeline\")",
+]) {
+  if (!curateImportRecordAction.includes(snippet)) {
+    throw new Error(`Curate import action is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -1449,6 +1498,22 @@ for (const snippet of [
 ]) {
   if (!rescueTimeDedupeMigration.includes(snippet)) {
     throw new Error(`RescueTime dedupe migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const importPromotionMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260506154500_add_import_promotion_metadata.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "timeline_events_source_type_check",
+  "source_type in ('manual', 'imported')",
+  "source_import_record_id uuid references public.import_records(id) on delete set null",
+  "source_metadata jsonb not null default '{}'::jsonb",
+  "timeline_events_source_import_record_idx",
+]) {
+  if (!importPromotionMigration.includes(snippet)) {
+    throw new Error(`Import promotion migration is missing expected snippet: ${snippet}`);
   }
 }
 

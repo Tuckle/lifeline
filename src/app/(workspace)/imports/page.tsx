@@ -21,6 +21,7 @@ async function ImportsContent() {
         hasConnectedSources={false}
         records={[]}
         sources={[]}
+        timelineOptions={[]}
       />
     );
   }

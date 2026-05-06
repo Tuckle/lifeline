@@ -11,6 +11,7 @@ export const ErrorCodes = {
   reflectionSessionSaveFailed: "reflection_session_save_failed",
   reflectionPatternSaveFailed: "reflection_pattern_save_failed",
   importAuthFailed: "import_auth_failed",
+  importCurationFailed: "import_curation_failed",
   offlineConflict: "offline_conflict",
 } as const;
 

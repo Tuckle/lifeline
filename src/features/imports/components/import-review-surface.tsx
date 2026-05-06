@@ -8,6 +8,7 @@ import { ImportStagingCard } from "@/features/imports/components/import-staging-
 import { NotesImportPanel } from "@/features/imports/components/notes-import-panel";
 import { RescueTimeConnectPanel } from "@/features/imports/components/rescuetime-connect-panel";
 import type {
+  ImportAttachTimelineEventOption,
   ImportRecordSummary,
   ImportSourceSummary,
 } from "@/features/imports/types";
@@ -16,12 +17,14 @@ type ImportReviewSurfaceProps = {
   hasConnectedSources: boolean;
   records: ImportRecordSummary[];
   sources: ImportSourceSummary[];
+  timelineOptions: ImportAttachTimelineEventOption[];
 };
 
 export function ImportReviewSurface({
   hasConnectedSources,
   records,
   sources,
+  timelineOptions,
 }: ImportReviewSurfaceProps) {
   const stagedRecords = records.filter((record) => record.lifecycleState === "staged");
   const groupedRecords = groupImportRecords(records);
@@ -160,7 +163,11 @@ export function ImportReviewSurface({
                 </p>
               </div>
               {group.records.map((record) => (
-                <ImportStagingCard key={record.id} record={record} />
+                <ImportStagingCard
+                  key={record.id}
+                  record={record}
+                  timelineOptions={timelineOptions}
+                />
               ))}
             </section>
           ))

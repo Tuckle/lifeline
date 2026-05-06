@@ -5,6 +5,7 @@ import { logImportError } from "@/features/imports/logger";
 import type {
   ImportRecordSummary,
   ImportSourceConnectionStatus,
+  ImportAttachTimelineEventOption,
   ImportSourceSummary,
   ImportSourceType,
 } from "@/features/imports/types";
@@ -41,6 +42,7 @@ export async function listImportReview(): Promise<
   ActionResult<{
     sources: ImportSourceSummary[];
     records: ImportRecordSummary[];
+    timelineOptions: ImportAttachTimelineEventOption[];
     hasConnectedSources: boolean;
   }>
 > {
@@ -57,7 +59,7 @@ export async function listImportReview(): Promise<
     };
   }
 
-  const [sourcesResult, recordsResult] = await Promise.all([
+  const [sourcesResult, recordsResult, timelineOptionsResult] = await Promise.all([
     supabase
       .from("import_sources")
       .select("id,source_type,display_name,connection_status,last_synced_at,source_metadata")
@@ -70,13 +72,20 @@ export async function listImportReview(): Promise<
       .neq("lifecycle_state", "deleted")
       .order("imported_at", { ascending: false })
       .limit(IMPORT_REVIEW_RECORD_LIMIT),
+    supabase
+      .from("timeline_events")
+      .select("id,title,approximate_date_label")
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
 
-  if (sourcesResult.error || recordsResult.error) {
+  if (sourcesResult.error || recordsResult.error || timelineOptionsResult.error) {
     logImportError("importAuthFailed", {
       technicalContext: {
         sourceQueryFailed: Boolean(sourcesResult.error),
         recordQueryFailed: Boolean(recordsResult.error),
+        timelineOptionsQueryFailed: Boolean(timelineOptionsResult.error),
       },
     });
 
@@ -96,12 +105,22 @@ export async function listImportReview(): Promise<
   const sources = ((sourcesResult.data ?? []) as ImportSourceRow[]).map((source) =>
     mapImportSource(source, stagedCounts.get(source.id) ?? 0),
   );
+  const timelineOptions = ((timelineOptionsResult.data ?? []) as Array<{
+    approximate_date_label: string | null;
+    id: string;
+    title: string;
+  }>).map((event) => ({
+    id: event.id,
+    title: event.title,
+    dateLabel: event.approximate_date_label,
+  }));
 
   return {
     ok: true,
     data: {
       sources,
       records,
+      timelineOptions,
       hasConnectedSources: sources.some(
         (source) => source.connectionStatus === "connected",
       ),
