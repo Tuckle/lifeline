@@ -92,7 +92,7 @@ export function MemoryCreationForm() {
               aria-invalid={Boolean(state.fieldErrors.title)}
               name="title"
               onChange={(event) => updateValue("title", event.target.value)}
-              placeholder="Moved to Bucharest, started therapy, childhood summer..."
+              placeholder="Moved to Bucharest, started weekly check-ins, childhood summer..."
               required
               value={values.title}
             />

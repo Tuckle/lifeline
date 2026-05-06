@@ -7,6 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ProductBoundaryNote } from "@/features/reviews/components/product-boundary-note";
 import {
   createFutureIntentionAction,
   initialFutureIntentionState,
@@ -59,6 +60,9 @@ export function FutureIntentionForm({
           This does not need a reflection, pattern, or full plan yet. A clear
           direction is enough.
         </p>
+      </div>
+      <div className="mt-5">
+        <ProductBoundaryNote />
       </div>
 
       <form action={action} className="mt-6 grid gap-4">

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { saveReflectionSessionAction } from "@/features/reviews/actions/save-reflection-session";
+import { ProductBoundaryNote } from "@/features/reviews/components/product-boundary-note";
 import type { PeriodReviewSelection } from "@/features/reviews/queries/get-period-review";
 import type { ReviewSessionSummary } from "@/features/reviews/queries/get-reflection-session";
 
@@ -67,6 +68,9 @@ export function ReflectionSessionForm({
             Back to period
           </Link>
         </Button>
+      </div>
+      <div className="mt-5">
+        <ProductBoundaryNote />
       </div>
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[0.8fr_1.2fr]">

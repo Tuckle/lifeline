@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
 import { formatImportanceLabel } from "@/features/timeline/components/importance-control";
 import { PatternClarityPanel } from "@/features/reviews/components/pattern-clarity-panel";
+import { ProductBoundaryNote } from "@/features/reviews/components/product-boundary-note";
 import type {
   PeriodReviewResult,
   PeriodReviewSelection,
@@ -31,6 +32,7 @@ export function PeriodReviewSurface({
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.35fr)] xl:items-start">
       <aside className="grid gap-5 xl:sticky xl:top-5">
+        <ProductBoundaryNote />
         <section
           aria-labelledby="period-review-summary-heading"
           className="rounded-md border border-border bg-card p-5 text-card-foreground shadow-soft"
@@ -47,7 +49,8 @@ export function PeriodReviewSurface({
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Lifeline is showing saved memories and intentions in this range.
-            You decide what they mean; this summary does not diagnose patterns.
+            You decide what they mean; this summary does not make conclusions
+            for you.
           </p>
 
           <dl className="mt-5 grid grid-cols-2 gap-3">

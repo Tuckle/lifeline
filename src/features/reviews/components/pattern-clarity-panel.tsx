@@ -58,7 +58,7 @@ export function PatternClarityPanel({
       </h2>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">
         A possible pattern is only a prompt. Saved patterns are your authored
-        interpretation, not a diagnosis or system conclusion.
+        interpretation, not a system conclusion.
       </p>
 
       <details className="mt-4 rounded-md border border-dashed border-reflection/40 bg-reflection/10 p-3">
@@ -173,7 +173,7 @@ function PatternCard({
     <article className="rounded-md border border-border bg-background p-4">
       <div className="flex flex-wrap gap-2">
         <Badge variant="outline">User-authored insight</Badge>
-        <Badge variant="outline">Not a diagnosis</Badge>
+        <Badge variant="outline">User chooses meaning</Badge>
       </div>
       <h3 className="mt-3 text-base font-semibold text-foreground">
         {pattern.title}

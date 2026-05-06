@@ -21,6 +21,7 @@ const requiredPaths = [
   "src/features/reviews/components/period-review-selector.tsx",
   "src/features/reviews/components/period-review-surface.tsx",
   "src/features/reviews/components/pattern-clarity-panel.tsx",
+  "src/features/reviews/components/product-boundary-note.tsx",
   "src/features/reviews/components/reflection-session-form.tsx",
   "src/features/reviews/queries/get-period-review.ts",
   "src/features/reviews/queries/get-reflection-patterns.ts",
@@ -488,6 +489,7 @@ for (const snippet of [
   "Linked past context",
   "No link yet",
   "Save intention",
+  "ProductBoundaryNote",
 ]) {
   if (!futureIntentionForm.includes(snippet)) {
     throw new Error(`Future intention form is missing expected snippet: ${snippet}`);
@@ -560,8 +562,9 @@ const periodReviewSurface = readFileSync(
 );
 for (const snippet of [
   "PeriodReviewSurface",
+  "ProductBoundaryNote",
   "What is in this period",
-  "does not diagnose patterns",
+  "does not make conclusions",
   "Priority memories",
   "Strong signals first",
   "LifeLineTimeline",
@@ -584,7 +587,7 @@ for (const snippet of [
   "PatternClarityPanel",
   "Pattern clarity",
   "User-authored",
-  "not a diagnosis",
+  "User chooses meaning",
   "Possible pattern prompt",
   "You can ignore this prompt",
   "Supporting memories",
@@ -660,6 +663,7 @@ const reflectionSessionForm = readFileSync(
 );
 for (const snippet of [
   "ReflectionSessionForm",
+  "ProductBoundaryNote",
   "Optional prompts",
   "What happened during this period?",
   "What repeated, changed, or surprised you?",
@@ -671,6 +675,22 @@ for (const snippet of [
 ]) {
   if (!reflectionSessionForm.includes(snippet)) {
     throw new Error(`Reflection session form is missing expected snippet: ${snippet}`);
+  }
+}
+
+const productBoundaryNote = readFileSync(
+  path.join(root, "src/features/reviews/components/product-boundary-note.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ProductBoundaryNote",
+  "Private reflection, user-owned meaning.",
+  "You choose what they mean",
+  "pause, edit",
+  "save a draft",
+]) {
+  if (!productBoundaryNote.includes(snippet)) {
+    throw new Error(`Product boundary note is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -1099,6 +1119,25 @@ const publicSourceSnapshot = [
 
 if (/public\/.*(photo|memory|timeline)|NEXT_PUBLIC_.*(photo|media|storage)/i.test(publicSourceSnapshot)) {
   throw new Error("Photo references must not introduce public private-media storage");
+}
+
+const productCopySnapshot = [
+  readFileSync(path.join(root, "src/app/(workspace)/settings/page.tsx"), "utf8"),
+  periodReviewSurface,
+  patternClarityPanel,
+  reflectionSessionForm,
+  futureIntentionForm,
+  memoryCreationForm,
+].join("\n");
+
+if (
+  /(therapy|therapist|diagnosis|diagnose|diagnostic|clinical|treatment|medical advice|streak|shame|guilt)/i.test(
+    productCopySnapshot,
+  )
+) {
+  throw new Error(
+    "Product copy should stay in private reflection and user-owned meaning language",
+  );
 }
 
 const seedSql = readFileSync(path.join(root, "supabase/seed.sql"), "utf8");
