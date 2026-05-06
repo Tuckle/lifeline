@@ -56,6 +56,7 @@ const requiredPaths = [
   "src/features/timeline/components/memory-detail-panel.tsx",
   "src/features/timeline/schemas/timeline-event-form.ts",
   "src/features/timeline/schemas/future-intention-form.ts",
+  "src/features/offline/components/offline-memory-draft-panel.tsx",
   "src/app/(workspace)/imports/page.tsx",
   "src/app/(workspace)/reflect/page.tsx",
   "src/app/(workspace)/search/page.tsx",
@@ -311,10 +312,43 @@ for (const snippet of [
 }
 
 const addPage = readFileSync(path.join(root, "src/app/(workspace)/add/page.tsx"), "utf8");
-for (const snippet of ["requireWorkspaceUser(\"/add\")", "MemoryCreationForm", "FutureIntentionForm"]) {
+for (const snippet of [
+  "requireWorkspaceUser(\"/add\")",
+  "MemoryCreationForm",
+  "OfflineMemoryDraftPanel",
+  "FutureIntentionForm",
+]) {
   if (!addPage.includes(snippet)) {
     throw new Error(`Add page is missing memory creation integration: ${snippet}`);
   }
+}
+
+const offlineMemoryDraftPanel = readFileSync(
+  path.join(root, "src/features/offline/components/offline-memory-draft-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "OfflineMemoryDraftPanel",
+  "OFFLINE_MEMORY_DRAFTS_KEY",
+  "lifeline:offline-memory-drafts",
+  "window.localStorage.setItem",
+  "readOfflineDrafts",
+  "navigator.onLine",
+  "Local only",
+  "Unsynced",
+  "Saved on this device",
+  "not a synced timeline event yet",
+  "does not sync imports, media, or reflections yet",
+  "Draft not saved yet",
+  "Save local draft",
+]) {
+  if (!offlineMemoryDraftPanel.includes(snippet)) {
+    throw new Error(`Offline memory draft panel is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/from\(\"timeline_events\"\)|createTimelineEventAction|importNotesAction|importRescueTimeAction|saveReflectionSessionAction/i.test(offlineMemoryDraftPanel)) {
+  throw new Error("Offline memory drafts must stay local-only in Story 5.1");
 }
 
 const listTimelineEventsQuery = readFileSync(

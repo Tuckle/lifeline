@@ -1,4 +1,5 @@
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
+import { OfflineMemoryDraftPanel } from "@/features/offline/components/offline-memory-draft-panel";
 import { FutureIntentionForm } from "@/features/timeline/components/future-intention-form";
 import { MemoryCreationForm } from "@/features/timeline/components/memory-creation-form";
 import { listFutureIntentionLinkOptions } from "@/features/timeline/queries/list-timeline-events";
@@ -20,6 +21,7 @@ async function AddContent() {
   return (
     <div className="grid gap-6">
       <MemoryCreationForm />
+      <OfflineMemoryDraftPanel />
       <FutureIntentionForm linkOptions={linkOptions} />
     </div>
   );
