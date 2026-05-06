@@ -21,9 +21,13 @@ const requiredPaths = [
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
   "src/features/timeline/actions/manage-timeline-event.ts",
+  "src/features/timeline/actions/manage-future-intention.ts",
+  "src/features/timeline/components/future-intention-card.tsx",
+  "src/features/timeline/components/future-intention-form.tsx",
   "src/features/timeline/components/memory-creation-form.tsx",
   "src/features/timeline/components/memory-detail-panel.tsx",
   "src/features/timeline/schemas/timeline-event-form.ts",
+  "src/features/timeline/schemas/future-intention-form.ts",
   "src/app/(workspace)/imports/page.tsx",
   "src/app/(workspace)/reflect/page.tsx",
   "src/app/(workspace)/search/page.tsx",
@@ -49,6 +53,7 @@ const requiredPaths = [
   "src/lib/supabase",
   "supabase/migrations/20260505182600_create_timeline_events.sql",
   "supabase/migrations/20260505201400_add_photo_references_to_timeline_events.sql",
+  "supabase/migrations/20260505210800_create_future_intentions.sql",
   "supabase/migrations",
 ];
 
@@ -225,7 +230,7 @@ for (const snippet of [
 }
 
 const addPage = readFileSync(path.join(root, "src/app/(workspace)/add/page.tsx"), "utf8");
-for (const snippet of ["requireWorkspaceUser(\"/add\")", "MemoryCreationForm"]) {
+for (const snippet of ["requireWorkspaceUser(\"/add\")", "MemoryCreationForm", "FutureIntentionForm"]) {
   if (!addPage.includes(snippet)) {
     throw new Error(`Add page is missing memory creation integration: ${snippet}`);
   }
@@ -246,6 +251,8 @@ for (const snippet of [
   "TimelineEventSummary",
   "photo_reference_url",
   "photo_alt_text",
+  "future_intentions",
+  "futureIntentions",
 ]) {
   if (!listTimelineEventsQuery.includes(snippet)) {
     throw new Error(`Timeline event list query is missing expected snippet: ${snippet}`);
@@ -263,6 +270,7 @@ for (const snippet of [
   "getImportanceProminence",
   "Present",
   "Future space",
+  "FutureIntentionCard",
   "reachedInitialLimit",
   "Incremental loading",
 ]) {
@@ -342,6 +350,40 @@ for (const snippet of [
   }
 }
 
+const futureIntentionForm = readFileSync(
+  path.join(root, "src/features/timeline/components/future-intention-form.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "FutureIntentionForm",
+  "future-intention",
+  "Intention title",
+  "Optional date",
+  "Optional period",
+  "Save intention",
+]) {
+  if (!futureIntentionForm.includes(snippet)) {
+    throw new Error(`Future intention form is missing expected snippet: ${snippet}`);
+  }
+}
+
+const futureIntentionCard = readFileSync(
+  path.join(root, "src/features/timeline/components/future-intention-card.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "FutureIntentionCard",
+  "Future intention",
+  "Edit or delete intention",
+  "Delete intention",
+  "window.confirm",
+  "submitEvent.preventDefault()",
+]) {
+  if (!futureIntentionCard.includes(snippet)) {
+    throw new Error(`Future intention card is missing expected snippet: ${snippet}`);
+  }
+}
+
 const timelineEventSchema = readFileSync(
   path.join(root, "src/features/timeline/schemas/timeline-event-form.ts"),
   "utf8",
@@ -413,6 +455,27 @@ for (const snippet of [
 ]) {
   if (!manageTimelineEventAction.includes(snippet)) {
     throw new Error(`Manage timeline event action is missing expected snippet: ${snippet}`);
+  }
+}
+
+const manageFutureIntentionAction = readFileSync(
+  path.join(root, "src/features/timeline/actions/manage-future-intention.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "createFutureIntentionAction",
+  "updateFutureIntentionAction",
+  "deleteFutureIntentionAction",
+  ".from(\"future_intentions\")",
+  ".insert",
+  ".update",
+  ".delete()",
+  "ErrorCodes.futureIntentionSaveFailed",
+  "revalidatePath(\"/timeline\")",
+]) {
+  if (!manageFutureIntentionAction.includes(snippet)) {
+    throw new Error(`Manage future intention action is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -608,6 +671,25 @@ for (const snippet of [
 ]) {
   if (!timelinePhotoReferencesMigration.includes(snippet)) {
     throw new Error(`Photo reference migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const futureIntentionsMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260505210800_create_future_intentions.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "create table if not exists public.future_intentions",
+  "user_id uuid not null references auth.users(id) on delete cascade",
+  "alter table public.future_intentions enable row level security",
+  "auth.uid() = user_id",
+  "future_intentions_select_own",
+  "future_intentions_insert_own",
+  "future_intentions_update_own",
+  "future_intentions_delete_own",
+]) {
+  if (!futureIntentionsMigration.includes(snippet)) {
+    throw new Error(`Future intentions migration is missing expected snippet: ${snippet}`);
   }
 }
 

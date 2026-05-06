@@ -28,6 +28,7 @@ async function TimelineContent() {
   return (
     <LifeLineTimeline
       events={result.data.events}
+      futureIntentions={result.data.futureIntentions}
       reachedInitialLimit={result.data.reachedInitialLimit}
     />
   );

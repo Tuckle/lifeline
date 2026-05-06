@@ -1,7 +1,10 @@
 import type { ActionResult } from "@/lib/action-result";
 import { ErrorCodes } from "@/lib/errors";
 import { createClient } from "@/lib/supabase/server";
-import type { TimelineEventSummary } from "@/features/timeline/types";
+import type {
+  FutureIntentionSummary,
+  TimelineEventSummary,
+} from "@/features/timeline/types";
 
 export const INITIAL_TIMELINE_EVENT_LIMIT = 50;
 
@@ -21,7 +24,11 @@ type TimelineEventRow = {
 };
 
 export async function listTimelineEvents(): Promise<
-  ActionResult<{ events: TimelineEventSummary[]; reachedInitialLimit: boolean }>
+  ActionResult<{
+    events: TimelineEventSummary[];
+    futureIntentions: FutureIntentionSummary[];
+    reachedInitialLimit: boolean;
+  }>
 > {
   const supabase = await createClient();
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
@@ -46,7 +53,14 @@ export async function listTimelineEvents(): Promise<
     .order("created_at", { ascending: true })
     .limit(INITIAL_TIMELINE_EVENT_LIMIT);
 
-  if (error) {
+  const { data: intentionsData, error: intentionsError } = await supabase
+    .from("future_intentions")
+    .select("id,title,target_on,target_label,status,created_at")
+    .eq("status", "active")
+    .order("target_on", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: true });
+
+  if (error || intentionsError) {
     return {
       ok: false,
       error: {
@@ -62,10 +76,22 @@ export async function listTimelineEvents(): Promise<
     ok: true,
     data: {
       events: rows.map(mapTimelineEvent),
+      futureIntentions: ((intentionsData ?? []) as FutureIntentionRow[]).map(
+        mapFutureIntention,
+      ),
       reachedInitialLimit: rows.length === INITIAL_TIMELINE_EVENT_LIMIT,
     },
   };
 }
+
+type FutureIntentionRow = {
+  id: string;
+  title: string;
+  target_on: string | null;
+  target_label: string | null;
+  status: string;
+  created_at: string;
+};
 
 function mapTimelineEvent(row: TimelineEventRow): TimelineEventSummary {
   const occurredOn = row.occurred_on ?? "";
@@ -86,6 +112,17 @@ function mapTimelineEvent(row: TimelineEventRow): TimelineEventSummary {
     sourceLabel: row.source_label,
     photoReferenceUrl: row.photo_reference_url,
     photoAltText: row.photo_alt_text,
+    createdAt: row.created_at,
+  };
+}
+
+function mapFutureIntention(row: FutureIntentionRow): FutureIntentionSummary {
+  return {
+    id: row.id,
+    title: row.title,
+    targetOn: row.target_on,
+    targetLabel: row.target_label,
+    status: row.status,
     createdAt: row.created_at,
   };
 }

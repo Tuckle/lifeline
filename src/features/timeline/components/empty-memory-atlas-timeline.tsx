@@ -17,7 +17,7 @@ const firstActions = [
     icon: CalendarPlus,
   },
   {
-    href: "/add?intent=future",
+    href: "/add#future-intention",
     label: "Add future intention",
     description: "Mark something you want to move toward.",
     icon: Sunrise,

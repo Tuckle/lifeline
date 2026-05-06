@@ -3,20 +3,26 @@ import { CalendarPlus, Milestone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EmptyMemoryAtlasTimeline } from "@/features/timeline/components/empty-memory-atlas-timeline";
+import { FutureIntentionCard } from "@/features/timeline/components/future-intention-card";
 import { getImportanceProminence } from "@/features/timeline/components/importance-control";
 import { MemoryAtlasCard } from "@/features/timeline/components/memory-atlas-card";
-import type { TimelineEventSummary } from "@/features/timeline/types";
+import type {
+  FutureIntentionSummary,
+  TimelineEventSummary,
+} from "@/features/timeline/types";
 
 type LifeLineTimelineProps = {
   events: TimelineEventSummary[];
+  futureIntentions: FutureIntentionSummary[];
   reachedInitialLimit: boolean;
 };
 
 export function LifeLineTimeline({
   events,
+  futureIntentions,
   reachedInitialLimit,
 }: LifeLineTimelineProps) {
-  if (events.length === 0) {
+  if (events.length === 0 && futureIntentions.length === 0) {
     return <EmptyMemoryAtlasTimeline />;
   }
 
@@ -97,16 +103,37 @@ export function LifeLineTimeline({
           </div>
         </div>
 
-        <div className="relative mt-5 pl-14 sm:grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:pl-0">
-          <div className="rounded-md border border-dashed border-future/40 bg-future/10 p-4 sm:col-start-2 sm:ml-10">
-            <p className="text-sm font-semibold text-foreground">
-              Future space
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Intentions will appear here once that flow is added.
-            </p>
-          </div>
-        </div>
+        <ol className="relative mt-5 grid gap-5">
+          {futureIntentions.length > 0 ? (
+            futureIntentions.map((intention) => (
+              <li
+                className="relative grid gap-4 pl-14 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:pl-0"
+                key={intention.id}
+              >
+                <div
+                  aria-label="Future intention"
+                  className="absolute left-0 top-2 flex size-10 items-center justify-center rounded-full border-4 border-background bg-future text-future-foreground sm:left-1/2 sm:-translate-x-1/2"
+                >
+                  <Milestone className="size-4" />
+                </div>
+                <div className="sm:col-start-2 sm:pl-10">
+                  <FutureIntentionCard intention={intention} />
+                </div>
+              </li>
+            ))
+          ) : (
+            <li className="relative pl-14 sm:grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:pl-0">
+              <div className="rounded-md border border-dashed border-future/40 bg-future/10 p-4 sm:col-start-2 sm:ml-10">
+                <p className="text-sm font-semibold text-foreground">
+                  Future space
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Intentions will appear here once you add them.
+                </p>
+              </div>
+            </li>
+          )}
+        </ol>
       </div>
 
       {reachedInitialLimit ? (

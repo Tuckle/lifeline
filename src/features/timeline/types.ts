@@ -16,3 +16,12 @@ export type TimelineEventSummary = {
   photoAltText: string | null;
   createdAt: string;
 };
+
+export type FutureIntentionSummary = {
+  id: string;
+  title: string;
+  targetOn: string | null;
+  targetLabel: string | null;
+  status: string;
+  createdAt: string;
+};
