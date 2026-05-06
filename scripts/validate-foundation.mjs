@@ -45,6 +45,7 @@ const requiredPaths = [
   "src/features/imports/logger.ts",
   "src/features/imports/rescuetime/client.ts",
   "src/features/imports/types.ts",
+  "src/features/offline/logger.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
@@ -356,6 +357,14 @@ for (const snippet of [
   "source metadata to avoid duplicate events",
   "one failed draft does not block the others",
   "Connect to the internet before syncing",
+  "Retry sync",
+  "Review conflict before choosing",
+  "Keep local version",
+  "Use server version",
+  "Cancel",
+  "Delete/discard local draft",
+  "Conflict review paused",
+  "Conflict resolved",
   "validateDraftFields",
   "draftErrors",
   "setDraftEdits",
@@ -378,22 +387,49 @@ const syncOfflineDraftAction = readFileSync(
 for (const snippet of [
   "\"use server\"",
   "syncOfflineDraftAction",
+  "resolveOfflineDraftConflictAction",
   "ActionResult",
+  "OfflineDraftConflict",
   "timelineEventFormSchema.safeParse",
   "supabase.auth.getClaims",
   ".from(\"timeline_events\")",
   ".eq(\"user_id\", userId)",
   ".contains(\"source_metadata\", { offlineDraftId: draftId })",
+  "ErrorCodes.offlineConflict",
+  "hasOfflineDraftConflict",
   "source_label: \"Offline draft\"",
   "source_metadata",
   "offlineDraftId",
+  "conflictResolvedAt",
   "syncedFrom: \"localStorage\"",
+  "logOfflineSyncError",
   "revalidatePath(\"/timeline\")",
   "revalidatePath(\"/add\")",
 ]) {
   if (!syncOfflineDraftAction.includes(snippet)) {
     throw new Error(`Offline draft sync action is missing expected snippet: ${snippet}`);
   }
+}
+
+const offlineLogger = readFileSync(
+  path.join(root, "src/features/offline/logger.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "logOfflineSyncError",
+  "offline_sync_error",
+  "ErrorCodes[context.errorCode]",
+  "draftId",
+  "syncStatus",
+  "technicalContext",
+]) {
+  if (!offlineLogger.includes(snippet)) {
+    throw new Error(`Offline logger is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/title|storyText|periodLabel|note|reflection/i.test(offlineLogger)) {
+  throw new Error("Offline sync diagnostics must not log sensitive memory content");
 }
 
 const listTimelineEventsQuery = readFileSync(

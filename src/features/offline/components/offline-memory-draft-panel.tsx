@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  initialOfflineDraftConflictResolutionState,
   initialOfflineDraftSyncState,
+  resolveOfflineDraftConflictAction,
   syncOfflineDraftAction,
 } from "@/features/offline/actions/sync-offline-draft";
 
@@ -466,6 +468,7 @@ export function OfflineMemoryDraftPanel() {
                 <OfflineDraftSyncControl
                   draft={draft}
                   isOnline={isOnline}
+                  onDelete={deleteDraft}
                   onStatusChange={updateDraftSyncStatus}
                 />
               </article>
@@ -484,27 +487,59 @@ export function OfflineMemoryDraftPanel() {
 function OfflineDraftSyncControl({
   draft,
   isOnline,
+  onDelete,
   onStatusChange,
 }: {
   draft: OfflineDraft;
   isOnline: boolean;
+  onDelete: (id: string) => void;
   onStatusChange: (id: string, status: OfflineSyncStatus) => void;
 }) {
   const [state, action, isPending] = useActionState(
     syncOfflineDraftAction,
     initialOfflineDraftSyncState,
   );
+  const [resolutionState, resolutionAction, isResolving] = useActionState(
+    resolveOfflineDraftConflictAction,
+    initialOfflineDraftConflictResolutionState,
+  );
   const handledResult = useRef<typeof state.result>(undefined);
+  const handledResolutionResult = useRef<typeof resolutionState.result>(undefined);
+  const [hiddenConflictId, setHiddenConflictId] = useState<string | null>(null);
   const result = state.result;
+  const conflict = state.conflict;
+  const resolutionResult = resolutionState.result;
 
   useEffect(() => {
     if (!result || handledResult.current === result) return;
 
     handledResult.current = result;
-    onStatusChange(draft.id, result.ok ? "synced" : "failed");
+    onStatusChange(
+      draft.id,
+      result.ok
+        ? "synced"
+        : result.error.code === "offline_conflict"
+          ? "conflict"
+          : "failed",
+    );
   }, [draft.id, onStatusChange, result]);
 
-  const currentStatus = isPending ? "sync_pending" : draft.syncStatus;
+  useEffect(() => {
+    if (!resolutionResult || handledResolutionResult.current === resolutionResult) {
+      return;
+    }
+
+    handledResolutionResult.current = resolutionResult;
+    onStatusChange(draft.id, resolutionResult.ok ? "synced" : "failed");
+  }, [draft.id, onStatusChange, resolutionResult]);
+
+  const currentStatus = isPending || isResolving ? "sync_pending" : draft.syncStatus;
+  const isConflictReviewHidden =
+    conflict?.server.timelineEventId === hiddenConflictId;
+  const syncButtonLabel =
+    draft.syncStatus === "failed" || draft.syncStatus === "conflict"
+      ? "Retry sync"
+      : "Sync local draft";
 
   return (
     <div className="mt-3 rounded-md border border-border bg-card p-3">
@@ -529,7 +564,7 @@ function OfflineDraftSyncControl({
           variant="outline"
         >
           <Send aria-hidden="true" className="size-4" />
-          {isPending ? "Sync pending..." : "Sync local draft"}
+          {isPending ? "Sync pending..." : syncButtonLabel}
         </Button>
       </form>
       {!isOnline ? (
@@ -542,9 +577,112 @@ function OfflineDraftSyncControl({
           {result.error.message}
         </p>
       ) : null}
+      {conflict && !isConflictReviewHidden ? (
+        <div className="mt-3 rounded-md border border-border bg-background p-3">
+          <p className="text-sm font-medium text-foreground">
+            Review conflict before choosing.
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-md border border-border p-3">
+              <p className="text-sm font-medium text-foreground">Local draft</p>
+              <p className="mt-2 text-sm text-muted-foreground">{draft.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {getDraftDateLabel(draft)}
+              </p>
+            </div>
+            <div className="rounded-md border border-border p-3">
+              <p className="text-sm font-medium text-foreground">
+                Timeline version
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {conflict.server.title}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {getServerDateLabel(conflict.server)}
+              </p>
+            </div>
+          </div>
+          <form action={resolutionAction} className="mt-3 flex flex-wrap gap-2">
+            <input name="draftId" type="hidden" value={draft.id} />
+            <input
+              name="timelineEventId"
+              type="hidden"
+              value={conflict.server.timelineEventId}
+            />
+            <input name="title" type="hidden" value={draft.title} />
+            <input
+              name="datePrecision"
+              type="hidden"
+              value={draft.datePrecision}
+            />
+            <input name="exactDate" type="hidden" value={draft.exactDate} />
+            <input name="periodLabel" type="hidden" value={draft.periodLabel} />
+            <Button
+              disabled={!isOnline || isResolving}
+              name="resolution"
+              type="submit"
+              value="keep_local"
+              variant="outline"
+            >
+              Keep local version
+            </Button>
+            <Button
+              disabled={!isOnline || isResolving}
+              name="resolution"
+              type="submit"
+              value="use_server"
+              variant="outline"
+            >
+              Use server version
+            </Button>
+            <Button
+              onClick={() =>
+                setHiddenConflictId(conflict.server.timelineEventId)
+              }
+              type="button"
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => onDelete(draft.id)}
+              type="button"
+              variant="outline"
+            >
+              <Trash2 aria-hidden="true" className="size-4" />
+              Delete/discard local draft
+            </Button>
+          </form>
+          {resolutionResult && !resolutionResult.ok ? (
+            <p className="mt-2 text-sm text-destructive" role="alert">
+              {resolutionResult.error.message}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+      {conflict && isConflictReviewHidden ? (
+        <div className="mt-3 rounded-md border border-border bg-background p-3">
+          <p className="text-sm text-muted-foreground">
+            Conflict review paused. The local draft is still saved.
+          </p>
+          <Button
+            className="mt-2"
+            onClick={() => setHiddenConflictId(null)}
+            type="button"
+            variant="outline"
+          >
+            Review conflict
+          </Button>
+        </div>
+      ) : null}
       {result?.ok ? (
         <p className="mt-2 text-sm text-muted-foreground">
           Synced. It will appear on the timeline in the correct date position.
+        </p>
+      ) : null}
+      {resolutionResult?.ok ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          Conflict resolved. The selected version is now the timeline version.
         </p>
       ) : null}
     </div>
@@ -593,4 +731,11 @@ function getDraftDateLabel(draft: OfflineDraft) {
   }
 
   return "Date unknown for now";
+}
+
+function getServerDateLabel(server: {
+  approximateDateLabel: string | null;
+  occurredOn: string | null;
+}) {
+  return server.approximateDateLabel ?? server.occurredOn ?? "Date unknown for now";
 }
