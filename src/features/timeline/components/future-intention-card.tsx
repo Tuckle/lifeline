@@ -13,13 +13,21 @@ import {
   initialFutureIntentionState,
   updateFutureIntentionAction,
 } from "@/features/timeline/actions/manage-future-intention";
-import type { FutureIntentionSummary } from "@/features/timeline/types";
+import type {
+  FutureIntentionLinkOption,
+  FutureIntentionSummary,
+} from "@/features/timeline/types";
 
 type FutureIntentionCardProps = {
   intention: FutureIntentionSummary;
+  linkOptions?: FutureIntentionLinkOption[];
 };
 
-export function FutureIntentionCard({ intention }: FutureIntentionCardProps) {
+export function FutureIntentionCard({
+  intention,
+  linkOptions = [],
+}: FutureIntentionCardProps) {
+  const mergedLinkOptions = mergeLinkOptions(linkOptions, intention.linkedContext);
   const [updateState, updateAction, isUpdating] = useActionState(
     updateFutureIntentionAction,
     {
@@ -28,6 +36,8 @@ export function FutureIntentionCard({ intention }: FutureIntentionCardProps) {
         title: intention.title,
         targetDate: intention.targetOn ?? "",
         targetLabel: intention.targetLabel ?? "",
+        linkType: intention.linkedContext?.type ?? "none",
+        linkedId: intention.linkedContext?.id ?? "",
       },
     },
   );
@@ -66,6 +76,18 @@ export function FutureIntentionCard({ intention }: FutureIntentionCardProps) {
       <h2 className="mt-1 text-section-title font-semibold">
         {intention.title}
       </h2>
+      {intention.linkedContext ? (
+        <p className="mt-3 rounded-md border border-future/30 bg-card px-3 py-2 text-sm text-muted-foreground">
+          Grows from{" "}
+          <a
+            className="font-medium text-primary underline-offset-4 hover:underline"
+            href={intention.linkedContext.href}
+          >
+            {formatLinkType(intention.linkedContext.type)}:{" "}
+            {intention.linkedContext.title}
+          </a>
+        </p>
+      ) : null}
 
       <details className="group mt-4 rounded-md border border-border bg-card/90">
         <summary className="flex min-h-11 cursor-pointer items-center justify-between gap-3 px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background">
@@ -113,6 +135,35 @@ export function FutureIntentionCard({ intention }: FutureIntentionCardProps) {
                 />
               </div>
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor={`future-link-${intention.id}`}>
+                Linked past context
+              </Label>
+              <select
+                className="min-h-11 rounded-md border border-input bg-card px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                id={`future-link-${intention.id}`}
+                name="linkedId"
+                onChange={(event) => {
+                  const option = mergedLinkOptions.find(
+                    (item) => item.id === event.target.value,
+                  );
+                  updateValue("linkedId", event.target.value);
+                  updateValue("linkType", option?.type ?? "none");
+                }}
+                value={values.linkedId}
+              >
+                <option value="">No link yet</option>
+                {mergedLinkOptions.map((option) => (
+                  <option key={`${option.type}-${option.id}`} value={option.id}>
+                    {formatLinkType(option.type)}: {option.title}
+                  </option>
+                ))}
+              </select>
+              <input name="linkType" type="hidden" value={values.linkType} />
+              <p className="text-sm text-muted-foreground">
+                Choose No link yet to unlink while keeping the intention.
+              </p>
+            </div>
             {updateState.result ? (
               updateState.result.ok ? (
                 <Alert variant="success">
@@ -159,4 +210,25 @@ export function FutureIntentionCard({ intention }: FutureIntentionCardProps) {
       </details>
     </article>
   );
+}
+
+function mergeLinkOptions(
+  options: FutureIntentionLinkOption[],
+  linkedContext: FutureIntentionSummary["linkedContext"],
+) {
+  if (!linkedContext) {
+    return options;
+  }
+
+  if (options.some((option) => option.id === linkedContext.id)) {
+    return options;
+  }
+
+  return [linkedContext, ...options];
+}
+
+function formatLinkType(type: FutureIntentionLinkOption["type"]) {
+  if (type === "reflection") return "Reflection";
+  if (type === "pattern") return "Pattern";
+  return "Memory";
 }

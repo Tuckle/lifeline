@@ -11,11 +11,27 @@ import {
   createFutureIntentionAction,
   initialFutureIntentionState,
 } from "@/features/timeline/actions/manage-future-intention";
+import type { FutureIntentionLinkOption } from "@/features/timeline/types";
 
-export function FutureIntentionForm() {
+type FutureIntentionFormProps = {
+  linkOptions?: FutureIntentionLinkOption[];
+  initialLink?: FutureIntentionLinkOption | null;
+};
+
+export function FutureIntentionForm({
+  linkOptions = [],
+  initialLink = null,
+}: FutureIntentionFormProps) {
   const [state, action, isPending] = useActionState(
     createFutureIntentionAction,
-    initialFutureIntentionState,
+    {
+      ...initialFutureIntentionState,
+      values: {
+        ...initialFutureIntentionState.values,
+        linkType: initialLink?.type ?? "none",
+        linkedId: initialLink?.id ?? "",
+      },
+    },
   );
   const [values, setValues] = useState(state.values);
 
@@ -86,6 +102,35 @@ export function FutureIntentionForm() {
           </div>
         </div>
 
+        <div className="grid gap-2">
+          <Label htmlFor="future-link">Linked past context</Label>
+          <select
+            className="min-h-11 rounded-md border border-input bg-card px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            id="future-link"
+            name="linkedId"
+            onChange={(event) => {
+              const option = linkOptions.find(
+                (item) => item.id === event.target.value,
+              );
+              updateValue("linkedId", event.target.value);
+              updateValue("linkType", option?.type ?? "none");
+            }}
+            value={values.linkedId}
+          >
+            <option value="">No link yet</option>
+            {linkOptions.map((option) => (
+              <option key={`${option.type}-${option.id}`} value={option.id}>
+                {formatLinkType(option.type)}: {option.title}
+              </option>
+            ))}
+          </select>
+          <input name="linkType" type="hidden" value={values.linkType} />
+          <p className="text-sm text-muted-foreground">
+            Optional. Link this intention to a reflection, pattern, or memory
+            that inspired it.
+          </p>
+        </div>
+
         {state.result ? (
           state.result.ok ? (
             <Alert variant="success">
@@ -109,4 +154,10 @@ export function FutureIntentionForm() {
       </form>
     </section>
   );
+}
+
+function formatLinkType(type: FutureIntentionLinkOption["type"]) {
+  if (type === "reflection") return "Reflection";
+  if (type === "pattern") return "Pattern";
+  return "Memory";
 }

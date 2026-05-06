@@ -24,4 +24,20 @@ export type FutureIntentionSummary = {
   targetLabel: string | null;
   status: string;
   createdAt: string;
+  linkedContext: FutureIntentionLinkedContext | null;
 };
+
+export type FutureIntentionLinkType =
+  | "none"
+  | "reflection"
+  | "pattern"
+  | "memory";
+
+export type FutureIntentionLinkedContext = {
+  type: Exclude<FutureIntentionLinkType, "none">;
+  id: string;
+  title: string;
+  href: string;
+};
+
+export type FutureIntentionLinkOption = FutureIntentionLinkedContext;

@@ -8,6 +8,7 @@ import { FutureIntentionCard } from "@/features/timeline/components/future-inten
 import { getImportanceProminence } from "@/features/timeline/components/importance-control";
 import { MemoryAtlasCard } from "@/features/timeline/components/memory-atlas-card";
 import type {
+  FutureIntentionLinkOption,
   FutureIntentionSummary,
   TimelineEventSummary,
 } from "@/features/timeline/types";
@@ -15,6 +16,7 @@ import type {
 type LifeLineTimelineProps = {
   events: TimelineEventSummary[];
   futureIntentions: FutureIntentionSummary[];
+  futureIntentionLinkOptions?: FutureIntentionLinkOption[];
   reachedInitialLimit: boolean;
   emptyState?: ReactNode;
   eyebrow?: string;
@@ -27,6 +29,7 @@ type LifeLineTimelineProps = {
 export function LifeLineTimeline({
   events,
   futureIntentions,
+  futureIntentionLinkOptions = [],
   reachedInitialLimit,
   emptyState,
   eyebrow = "Memory Atlas",
@@ -129,7 +132,10 @@ export function LifeLineTimeline({
                   <Milestone className="size-4" />
                 </div>
                 <div className="sm:col-start-2 sm:pl-10">
-                  <FutureIntentionCard intention={intention} />
+                  <FutureIntentionCard
+                    intention={intention}
+                    linkOptions={futureIntentionLinkOptions}
+                  />
                 </div>
               </li>
             ))

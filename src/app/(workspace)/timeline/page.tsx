@@ -3,7 +3,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PeriodReviewSelector } from "@/features/reviews/components/period-review-selector";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
 import { TimelineSearchPanel } from "@/features/timeline/components/timeline-search-panel";
-import { listTimelineEvents } from "@/features/timeline/queries/list-timeline-events";
+import {
+  listFutureIntentionLinkOptions,
+  listTimelineEvents,
+} from "@/features/timeline/queries/list-timeline-events";
 import { parseTimelineSearchParams } from "@/features/timeline/queries/search-timeline";
 import { Suspense } from "react";
 
@@ -17,7 +20,10 @@ export default function TimelinePage() {
 
 async function TimelineContent() {
   await requireWorkspaceUser("/timeline");
-  const result = await listTimelineEvents();
+  const [result, linkOptionsResult] = await Promise.all([
+    listTimelineEvents(),
+    listFutureIntentionLinkOptions(),
+  ]);
 
   if (!result.ok) {
     return (
@@ -29,6 +35,7 @@ async function TimelineContent() {
   }
 
   const searchFilters = parseTimelineSearchParams({});
+  const linkOptions = linkOptionsResult.ok ? linkOptionsResult.data : [];
 
   return (
     <div className="grid gap-5">
@@ -46,6 +53,7 @@ async function TimelineContent() {
       <LifeLineTimeline
         events={result.data.events}
         futureIntentions={result.data.futureIntentions}
+        futureIntentionLinkOptions={linkOptions}
         reachedInitialLimit={result.data.reachedInitialLimit}
       />
     </div>

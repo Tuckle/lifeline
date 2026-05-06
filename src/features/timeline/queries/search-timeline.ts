@@ -443,6 +443,7 @@ function mapFutureIntention(row: FutureIntentionRow): FutureIntentionSummary {
     targetLabel: row.target_label,
     status: row.status,
     createdAt: row.created_at,
+    linkedContext: null,
   };
 }
 

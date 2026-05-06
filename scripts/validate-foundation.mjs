@@ -68,6 +68,7 @@ const requiredPaths = [
   "supabase/migrations/20260505210800_create_future_intentions.sql",
   "supabase/migrations/20260506102400_create_review_sessions.sql",
   "supabase/migrations/20260506103600_create_reflection_patterns.sql",
+  "supabase/migrations/20260506104900_create_future_intention_links.sql",
   "supabase/migrations",
 ];
 
@@ -310,6 +311,9 @@ for (const snippet of [
   "photo_alt_text",
   "future_intentions",
   "futureIntentions",
+  "listFutureIntentionLinkOptions",
+  "future_intention_links",
+  "linkedContext",
 ]) {
   if (!listTimelineEventsQuery.includes(snippet)) {
     throw new Error(`Timeline event list query is missing expected snippet: ${snippet}`);
@@ -481,6 +485,8 @@ for (const snippet of [
   "Intention title",
   "Optional date",
   "Optional period",
+  "Linked past context",
+  "No link yet",
   "Save intention",
 ]) {
   if (!futureIntentionForm.includes(snippet)) {
@@ -495,6 +501,9 @@ const futureIntentionCard = readFileSync(
 for (const snippet of [
   "FutureIntentionCard",
   "Future intention",
+  "Grows from",
+  "Linked past context",
+  "Choose No link yet to unlink",
   "Edit or delete intention",
   "Delete intention",
   "window.confirm",
@@ -596,8 +605,11 @@ for (const snippet of [
   "requireWorkspaceUser(\"/reflect/session\")",
   "ReflectionSessionForm",
   "PatternClarityPanel",
+  "FutureIntentionForm",
+  "completedReflectionLink",
   "parsePeriodReviewParams",
   "listReflectionPatternsForPeriod",
+  "listFutureIntentionLinkOptions",
   "getReflectionSessionForPeriod",
   "Reflection could not load",
 ]) {
@@ -787,6 +799,8 @@ for (const snippet of [
   ".update",
   ".delete()",
   "ErrorCodes.futureIntentionSaveFailed",
+  "replaceFutureIntentionLink",
+  ".from(\"future_intention_links\")",
   "revalidatePath(\"/timeline\")",
 ]) {
   if (!manageFutureIntentionAction.includes(snippet)) {
@@ -1050,6 +1064,28 @@ for (const snippet of [
 ]) {
   if (!reflectionPatternsMigration.includes(snippet)) {
     throw new Error(`Reflection patterns migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const futureIntentionLinksMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260506104900_create_future_intention_links.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "create table if not exists public.future_intention_links",
+  "future_intention_id uuid not null references public.future_intentions(id) on delete cascade",
+  "review_session_id uuid references public.review_sessions(id) on delete cascade",
+  "reflection_pattern_id uuid references public.reflection_patterns(id) on delete cascade",
+  "timeline_event_id uuid references public.timeline_events(id) on delete cascade",
+  "num_nonnulls(review_session_id, reflection_pattern_id, timeline_event_id) = 1",
+  "unique (future_intention_id)",
+  "alter table public.future_intention_links enable row level security",
+  "future_intention_links_select_own",
+  "future_intention_links_insert_own",
+  "future_intention_links_delete_own",
+]) {
+  if (!futureIntentionLinksMigration.includes(snippet)) {
+    throw new Error(`Future intention links migration is missing expected snippet: ${snippet}`);
   }
 }
 

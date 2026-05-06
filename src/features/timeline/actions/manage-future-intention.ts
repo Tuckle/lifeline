@@ -20,7 +20,13 @@ type FutureIntentionState = {
 };
 
 export const initialFutureIntentionState: FutureIntentionState = {
-  values: { title: "", targetDate: "", targetLabel: "" },
+  values: {
+    title: "",
+    targetDate: "",
+    targetLabel: "",
+    linkType: "none",
+    linkedId: "",
+  },
   fieldErrors: {},
 };
 
@@ -58,7 +64,14 @@ export async function createFutureIntentionAction(
     return failedFutureIntentionState(values);
   }
 
+  const linkResult = await replaceFutureIntentionLink(data.id, parsed.data);
+
+  if (!linkResult.ok) {
+    return failedFutureIntentionState(values, linkResult.error.message);
+  }
+
   revalidatePath("/timeline");
+  revalidatePath("/reflect");
   return {
     values: initialFutureIntentionState.values,
     fieldErrors: {},
@@ -102,6 +115,7 @@ export async function deleteFutureIntentionAction(
   }
 
   revalidatePath("/timeline");
+  revalidatePath("/reflect");
   return {
     values: initialFutureIntentionState.values,
     fieldErrors: {},
@@ -132,8 +146,63 @@ async function updateFutureIntention(
     };
   }
 
+  const linkResult = await replaceFutureIntentionLink(values.id, values);
+
+  if (!linkResult.ok) {
+    return linkResult;
+  }
+
   revalidatePath("/timeline");
+  revalidatePath("/reflect");
   return { ok: true, data: { id: values.id } };
+}
+
+async function replaceFutureIntentionLink(
+  futureIntentionId: string,
+  values: Pick<FutureIntentionFormValues, "linkType" | "linkedId">,
+): Promise<ActionResult<{ id: string }>> {
+  const supabase = await createClient();
+  const { error: deleteError } = await supabase
+    .from("future_intention_links")
+    .delete()
+    .eq("future_intention_id", futureIntentionId);
+
+  if (deleteError) {
+    return {
+      ok: false,
+      error: {
+        code: ErrorCodes.futureIntentionSaveFailed,
+        message: "The intention was saved, but its past link could not update yet.",
+      },
+    };
+  }
+
+  if (values.linkType === "none" || !values.linkedId) {
+    return { ok: true, data: { id: futureIntentionId } };
+  }
+
+  const payload = {
+    future_intention_id: futureIntentionId,
+    review_session_id:
+      values.linkType === "reflection" ? values.linkedId : null,
+    reflection_pattern_id:
+      values.linkType === "pattern" ? values.linkedId : null,
+    timeline_event_id: values.linkType === "memory" ? values.linkedId : null,
+  };
+
+  const { error } = await supabase.from("future_intention_links").insert(payload);
+
+  if (error) {
+    return {
+      ok: false,
+      error: {
+        code: ErrorCodes.futureIntentionSaveFailed,
+        message: "This intention could not link to the past context yet.",
+      },
+    };
+  }
+
+  return { ok: true, data: { id: futureIntentionId } };
 }
 
 function invalidFutureIntentionState(
@@ -168,6 +237,7 @@ function permissionFutureIntentionState(
 
 function failedFutureIntentionState(
   values: FutureIntentionState["values"],
+  message = "This intention could not be changed yet. Please try again.",
 ): FutureIntentionState {
   return {
     values,
@@ -176,7 +246,7 @@ function failedFutureIntentionState(
       ok: false,
       error: {
         code: ErrorCodes.futureIntentionSaveFailed,
-        message: "This intention could not be changed yet. Please try again.",
+        message,
       },
     },
   };

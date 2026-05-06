@@ -4,6 +4,8 @@ export const futureIntentionFormSchema = z.object({
   title: z.string().trim().min(1, "Add a title for this intention.").max(180),
   targetDate: z.string().trim().optional(),
   targetLabel: z.string().trim().max(120).optional(),
+  linkType: z.enum(["none", "reflection", "pattern", "memory"]),
+  linkedId: z.string().trim().optional(),
 });
 
 export const futureIntentionUpdateSchema = futureIntentionFormSchema.extend({
@@ -18,9 +20,15 @@ export function getFutureIntentionFormValues(formData: FormData) {
     title: String(formData.get("title") ?? ""),
     targetDate: String(formData.get("targetDate") ?? ""),
     targetLabel: String(formData.get("targetLabel") ?? ""),
+    linkType: getLinkType(String(formData.get("linkType") ?? "")),
+    linkedId: String(formData.get("linkedId") ?? ""),
   };
 }
 
 export function getFutureDateLabel(values: FutureIntentionFormValues) {
   return values.targetLabel || values.targetDate || "Future timing open";
+}
+
+function getLinkType(value: string) {
+  return ["reflection", "pattern", "memory"].includes(value) ? value : "none";
 }
