@@ -287,6 +287,15 @@ for (const snippet of [
   ".eq(\"user_id\", userId)",
   "settingsLoadFailed",
   "hasConnectedSources",
+  "source_metadata",
+  "lifecycleCounts",
+  "syncCounts",
+  "metadataDetails",
+  "permissionSummary",
+  "futureAccessSummary",
+  "getSafeMetadataDetails",
+  "getIssueSummary",
+  "getManagementActions",
 ]) {
   if (!privacyDataSummaryQuery.includes(snippet)) {
     throw new Error(`Privacy data summary query is missing expected snippet: ${snippet}`);
@@ -310,6 +319,15 @@ for (const snippet of [
   "Review sources",
   "Review deletion",
   "Manual memories remain separate",
+  "Future source access",
+  "Already imported records",
+  "Aggregate record states",
+  "Source metadata for export/delete decisions",
+  "Open import recovery",
+  "Review disconnect",
+  "Failed {source.syncCounts.failed}",
+  "Partial {source.syncCounts.partial}",
+  "source.managementActions.map",
 ]) {
   if (!privacyDataSection.includes(snippet)) {
     throw new Error(`Privacy data section is missing expected snippet: ${snippet}`);

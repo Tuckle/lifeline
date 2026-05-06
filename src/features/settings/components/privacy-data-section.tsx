@@ -155,6 +155,7 @@ export function PrivacyDataSection({ summary }: PrivacyDataSectionProps) {
                     ? new Date(source.lastSyncedAt).toLocaleString()
                     : "Not synced yet"}
                 </p>
+                <SourcePermissionDetails source={source} />
               </div>
             ))}
           </div>
@@ -244,4 +245,96 @@ function SummaryMetric({
       <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
     </div>
   );
+}
+
+function SourcePermissionDetails({
+  source,
+}: {
+  source: PrivacyDataSummary["sources"][number];
+}) {
+  return (
+    <div className="mt-3 grid gap-3">
+      <div className="grid gap-3 lg:grid-cols-2">
+        <div className="rounded-md border border-border bg-card p-3">
+          <p className="text-sm font-medium text-foreground">
+            Future source access
+          </p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {source.permissionSummary}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {source.futureAccessSummary}
+          </p>
+        </div>
+
+        <div className="rounded-md border border-border bg-card p-3">
+          <p className="text-sm font-medium text-foreground">
+            Already imported records
+          </p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {source.importedContextSummary}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {source.issueSummary}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border bg-card p-3">
+        <p className="text-sm font-medium text-foreground">
+          Aggregate record states
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Badge variant="outline">Staged {source.lifecycleCounts.staged}</Badge>
+          <Badge variant="outline">
+            Promoted {source.lifecycleCounts.promoted}
+          </Badge>
+          <Badge variant="outline">
+            Attached {source.lifecycleCounts.attached}
+          </Badge>
+          <Badge variant="outline">Hidden {source.lifecycleCounts.hidden}</Badge>
+          <Badge variant="outline">
+            Discarded {source.lifecycleCounts.discarded}
+          </Badge>
+          <Badge variant="outline">Failed {source.syncCounts.failed}</Badge>
+          <Badge variant="outline">Partial {source.syncCounts.partial}</Badge>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border bg-card p-3">
+        <p className="text-sm font-medium text-foreground">
+          Source metadata for export/delete decisions
+        </p>
+        <ul className="mt-2 grid gap-1 text-sm leading-6 text-muted-foreground">
+          {source.metadataDetails.map((detail) => (
+            <li key={detail}>{detail}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {source.managementActions.map((action) => (
+          <Button asChild key={action} variant="outline">
+            <Link href={getManagementActionHref(action)}>{action}</Link>
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getManagementActionHref(action: string) {
+  if (action === "Open import review" || action === "Open import recovery") {
+    return "/imports";
+  }
+
+  if (action === "Review disconnect") {
+    return "#disconnect-source";
+  }
+
+  if (action === "Review delete") {
+    return "#delete-imported-data";
+  }
+
+  return "#connected-source-permissions";
 }
