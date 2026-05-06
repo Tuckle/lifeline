@@ -1,5 +1,5 @@
 # generated: 2026-05-04T19:20:41+0300
-# last_updated: 2026-05-06T15:53:07+0300
+# last_updated: 2026-05-06T18:46:45+0300
 # project: lifeline
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: "2026-05-04T19:20:41+0300"
-last_updated: "2026-05-06T15:53:07+0300"
+last_updated: "2026-05-06T18:46:45+0300"
 project: lifeline
 project_key: NOKEY
 tracking_system: file-system
@@ -66,14 +66,14 @@ development_status:
   3-5-link-future-intentions-to-reflections-and-patterns: done
   3-6-product-boundary-and-emotional-safety-language: done
   epic-3-retrospective: optional
-  epic-4: in-progress
+  epic-4: done
   4-1-import-review-staging-foundation: done
   4-2-connect-and-import-rescuetime-data: done
   4-3-import-notes-content: done
   4-4-inspect-staged-import-records: done
   4-5-promote-or-attach-imported-context: done
   4-6-hide-discard-and-control-resurfaced-imports: done
-  4-7-import-error-recovery-and-support-path: backlog
+  4-7-import-error-recovery-and-support-path: done
   epic-4-retrospective: optional
   epic-5: backlog
   5-1-create-offline-timeline-draft: backlog

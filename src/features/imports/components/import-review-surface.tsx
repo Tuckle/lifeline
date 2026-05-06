@@ -4,6 +4,7 @@ import { Database, FileText, TimerReset } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ImportRecoveryPanel } from "@/features/imports/components/import-recovery-panel";
 import { ImportStagingCard } from "@/features/imports/components/import-staging-card";
 import { NotesImportPanel } from "@/features/imports/components/notes-import-panel";
 import { RescueTimeConnectPanel } from "@/features/imports/components/rescuetime-connect-panel";
@@ -86,6 +87,7 @@ export function ImportReviewSurface({
 
         <RescueTimeConnectPanel />
         <NotesImportPanel />
+        <ImportRecoveryPanel sources={sources} />
 
         {sources.length > 0 ? (
           <section

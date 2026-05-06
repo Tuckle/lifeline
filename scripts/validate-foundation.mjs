@@ -31,6 +31,7 @@ const requiredPaths = [
   "src/features/reviews/schemas/reflection-pattern-form.ts",
   "src/features/reviews/schemas/reflection-session-form.ts",
   "src/features/imports/components/import-review-surface.tsx",
+  "src/features/imports/components/import-recovery-panel.tsx",
   "src/features/imports/components/import-staging-card.tsx",
   "src/features/imports/components/import-record-curation-actions.tsx",
   "src/features/imports/components/notes-import-panel.tsx",
@@ -38,6 +39,7 @@ const requiredPaths = [
   "src/features/imports/actions/curate-import-record.ts",
   "src/features/imports/actions/notes-import.ts",
   "src/features/imports/actions/rescuetime-import.ts",
+  "src/features/imports/actions/source-recovery.ts",
   "src/features/imports/notes/parse-notes-export.ts",
   "src/features/imports/queries/list-import-review.ts",
   "src/features/imports/logger.ts",
@@ -590,6 +592,7 @@ for (const snippet of [
   "Connect RescueTime",
   "Import notes",
   "ImportStagingCard",
+  "ImportRecoveryPanel",
   "NotesImportPanel",
   "RescueTimeConnectPanel",
   "No staged imports yet",
@@ -625,6 +628,53 @@ for (const snippet of [
   if (!importStagingCard.includes(snippet)) {
     throw new Error(`Import staging card is missing expected snippet: ${snippet}`);
   }
+}
+
+const importRecoveryPanel = readFileSync(
+  path.join(root, "src/features/imports/components/import-recovery-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ImportRecoveryPanel",
+  "Import recovery",
+  "Fix import issues without touching your timeline",
+  "Authorization or expired access",
+  "Network, source availability, or partial sync",
+  "Source data or unknown issue",
+  "Retry or reconnect",
+  "Ignore issue",
+  "Disconnect source",
+  "Contact support without private content",
+  "Please%20do%20not%20include%20note%20content",
+  "Timeline content and account access are",
+]) {
+  if (!importRecoveryPanel.includes(snippet)) {
+    throw new Error(`Import recovery panel is missing expected snippet: ${snippet}`);
+  }
+}
+
+const sourceRecoveryAction = readFileSync(
+  path.join(root, "src/features/imports/actions/source-recovery.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "ignoreImportSourceIssueAction",
+  "disconnectImportSourceAction",
+  ".from(\"import_sources\")",
+  "connection_status",
+  "\"connected\"",
+  "\"disconnected\"",
+  "revalidatePath(\"/imports\")",
+  "Your staged records are unchanged",
+]) {
+  if (!sourceRecoveryAction.includes(snippet)) {
+    throw new Error(`Source recovery action is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/note.*body|reflection.*text|activity.*detail|timeline.*content.*update/i.test(sourceRecoveryAction)) {
+  throw new Error("Source recovery actions must not handle sensitive content");
 }
 
 const importRecordCurationActions = readFileSync(
