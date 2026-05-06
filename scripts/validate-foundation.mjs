@@ -32,8 +32,11 @@ const requiredPaths = [
   "src/features/reviews/schemas/reflection-session-form.ts",
   "src/features/imports/components/import-review-surface.tsx",
   "src/features/imports/components/import-staging-card.tsx",
+  "src/features/imports/components/rescuetime-connect-panel.tsx",
+  "src/features/imports/actions/rescuetime-import.ts",
   "src/features/imports/queries/list-import-review.ts",
   "src/features/imports/logger.ts",
+  "src/features/imports/rescuetime/client.ts",
   "src/features/imports/types.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
@@ -76,6 +79,7 @@ const requiredPaths = [
   "supabase/migrations/20260506103600_create_reflection_patterns.sql",
   "supabase/migrations/20260506104900_create_future_intention_links.sql",
   "supabase/migrations/20260506104700_create_import_staging.sql",
+  "supabase/migrations/20260506105300_add_rescuetime_import_dedupe.sql",
   "supabase/migrations",
 ];
 
@@ -105,7 +109,11 @@ for (const [dependency, expectedVersion] of Object.entries({
 }
 
 const envExample = readFileSync(path.join(root, ".env.example"), "utf8");
-for (const key of ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"]) {
+for (const key of [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "RESCUETIME_API_KEY",
+]) {
   if (!envExample.includes(key)) {
     throw new Error(`.env.example is missing ${key}`);
   }
@@ -575,6 +583,7 @@ for (const snippet of [
   "Connect RescueTime",
   "Import notes",
   "ImportStagingCard",
+  "RescueTimeConnectPanel",
   "No staged imports yet",
 ]) {
   if (!importReviewSurface.includes(snippet)) {
@@ -600,6 +609,74 @@ for (const snippet of [
 ]) {
   if (!importStagingCard.includes(snippet)) {
     throw new Error(`Import staging card is missing expected snippet: ${snippet}`);
+  }
+}
+
+const rescueTimeConnectPanel = readFileSync(
+  path.join(root, "src/features/imports/components/rescuetime-connect-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "RescueTimeConnectPanel",
+  "Connect activity context",
+  "server-side API key",
+  "stay staged",
+  "connectRescueTimeFormAction",
+  "importRescueTimeAction",
+  "Import RescueTime range",
+  "retry, reconnect",
+]) {
+  if (!rescueTimeConnectPanel.includes(snippet)) {
+    throw new Error(`RescueTime connect panel is missing expected snippet: ${snippet}`);
+  }
+}
+
+const rescueTimeImportAction = readFileSync(
+  path.join(root, "src/features/imports/actions/rescuetime-import.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "RESCUETIME_API_KEY",
+  "connectRescueTimeAction",
+  "importRescueTimeAction",
+  ".from(\"import_sources\")",
+  ".from(\"import_records\")",
+  "fetchRescueTimeHourlyProductivity",
+  "source_type: \"rescuetime\"",
+  "lifecycle_state: \"staged\"",
+  "sync_status: \"succeeded\"",
+  "onConflict: \"user_id,source_type,source_record_id\"",
+  "revalidatePath(\"/imports\")",
+]) {
+  if (!rescueTimeImportAction.includes(snippet)) {
+    throw new Error(`RescueTime import action is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/\.from\(\"timeline_events\"\)|NEXT_PUBLIC_RESCUETIME|source_metadata:\s*{[^}]*apiKey/i.test(rescueTimeImportAction)) {
+  throw new Error("RescueTime import action must keep secrets server-side and avoid timeline auto-promotion");
+}
+
+const rescueTimeClient = readFileSync(
+  path.join(root, "src/features/imports/rescuetime/client.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "server-only",
+  "https://www.rescuetime.com/anapi/data",
+  "format",
+  "perspective",
+  "restrict_kind",
+  "interval",
+  "restrict_begin",
+  "restrict_end",
+  "row_headers",
+  "rows",
+  "normalizeRescueTimeRows",
+]) {
+  if (!rescueTimeClient.includes(snippet)) {
+    throw new Error(`RescueTime client is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -1273,6 +1350,20 @@ for (const snippet of [
 
 if (/insert\s+into\s+public\.timeline_events/i.test(importStagingMigration)) {
   throw new Error("Import staging migration must not create primary timeline events");
+}
+
+const rescueTimeDedupeMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260506105300_add_rescuetime_import_dedupe.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "import_records_user_source_record_unique_idx",
+  "public.import_records",
+  "user_id, source_type, source_record_id",
+]) {
+  if (!rescueTimeDedupeMigration.includes(snippet)) {
+    throw new Error(`RescueTime dedupe migration is missing expected snippet: ${snippet}`);
+  }
 }
 
 const publicSourceSnapshot = [

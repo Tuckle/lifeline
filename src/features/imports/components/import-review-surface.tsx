@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImportStagingCard } from "@/features/imports/components/import-staging-card";
+import { RescueTimeConnectPanel } from "@/features/imports/components/rescuetime-connect-panel";
 import type {
   ImportRecordSummary,
   ImportSourceSummary,
@@ -77,6 +78,8 @@ export function ImportReviewSurface({
             </Button>
           </div>
         </section>
+
+        <RescueTimeConnectPanel />
 
         {sources.length > 0 ? (
           <section
