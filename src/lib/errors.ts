@@ -12,6 +12,7 @@ export const ErrorCodes = {
   reflectionPatternSaveFailed: "reflection_pattern_save_failed",
   importAuthFailed: "import_auth_failed",
   importCurationFailed: "import_curation_failed",
+  importDeleteFailed: "import_delete_failed",
   offlineConflict: "offline_conflict",
   settingsLoadFailed: "settings_load_failed",
 } as const;

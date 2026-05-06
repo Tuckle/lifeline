@@ -30,6 +30,10 @@ import {
   disconnectImportSourceAction,
   initialSourceRecoveryState,
 } from "@/features/imports/actions/source-recovery";
+import {
+  deleteImportedDataForSourceAction,
+  initialDeleteImportedDataState,
+} from "@/features/settings/actions/delete-imported-data";
 import type { PrivacyDataSummary } from "@/features/settings/queries/get-privacy-data-summary";
 
 type PrivacyDataSectionProps = {
@@ -336,6 +340,7 @@ function SourcePermissionDetails({
           </Button>
         ))}
         <DisconnectSourceControl source={source} />
+        <DeleteImportedDataControl source={source} />
       </div>
     </div>
   );
@@ -397,6 +402,77 @@ function DisconnectSourceControl({
           <p className="text-sm text-muted-foreground" role="status">
             Source disconnected. Existing imported records remain available for
             review and future delete controls.
+          </p>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DeleteImportedDataControl({
+  source,
+}: {
+  source: PrivacyDataSummary["sources"][number];
+}) {
+  const [state, action, isPending] = useActionState(
+    deleteImportedDataForSourceAction,
+    initialDeleteImportedDataState,
+  );
+  const hasImportedRecords = source.importedRecordCount > 0;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button disabled={!hasImportedRecords} type="button" variant="destructive">
+          <Trash2 aria-hidden="true" className="size-4" />
+          Delete imported data
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete imported data from {source.displayName}</DialogTitle>
+          <DialogDescription>
+            This marks imported records from this source as deleted. Manual
+            memories, reflections, and future intentions stay separate and will
+            not be deleted.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-3 text-sm leading-6 text-muted-foreground">
+          <div className="rounded-md border border-border bg-background p-3">
+            Affected scope: {source.importedRecordCount} imported record(s) from{" "}
+            {source.displayName}. Future sync behavior is unchanged unless you
+            disconnect the source separately.
+          </div>
+          <div className="rounded-md border border-border bg-background p-3">
+            Promoted imported timeline events created from these records will be
+            marked deleted. Attached manual memories keep their memory content;
+            the imported supporting record is removed from normal Import Review.
+          </div>
+        </div>
+        <form action={action} className="grid gap-3">
+          <input name="sourceId" type="hidden" value={source.id} />
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button disabled={isPending} type="button" variant="outline">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button disabled={isPending} type="submit" variant="destructive">
+              {isPending ? "Deleting imported data..." : "Delete imported data"}
+            </Button>
+          </DialogFooter>
+        </form>
+        {state.result && !state.result.ok ? (
+          <p className="text-sm text-destructive" role="alert">
+            {state.result.error.message} No data is shown as deleted until the
+            server confirms the change.
+          </p>
+        ) : null}
+        {state.result?.ok ? (
+          <p className="text-sm text-muted-foreground" role="status">
+            Deleted {state.result.data.deletedRecordCount} imported record(s).
+            Promoted imported timeline events updated:{" "}
+            {state.result.data.deletedTimelineEventCount}.
           </p>
         ) : null}
       </DialogContent>

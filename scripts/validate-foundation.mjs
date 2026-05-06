@@ -77,6 +77,7 @@ const requiredPaths = [
   "src/features/imports",
   "src/features/reviews",
   "src/features/settings",
+  "src/features/settings/actions/delete-imported-data.ts",
   "src/features/settings/components/privacy-data-section.tsx",
   "src/features/settings/queries/get-privacy-data-summary.ts",
   "src/features/offline",
@@ -335,6 +336,16 @@ for (const snippet of [
   "Manual memories, reflections, and future intentions are separate",
   "Disconnecting...",
   "Source disconnected",
+  "DeleteImportedDataControl",
+  "deleteImportedDataForSourceAction",
+  "initialDeleteImportedDataState",
+  "Affected scope:",
+  "Future sync behavior is unchanged",
+  "Promoted imported timeline events created from these records will be",
+  "Attached manual memories keep their memory content",
+  "Deleting imported data...",
+  "No data is shown as deleted until the",
+  "Deleted {state.result.data.deletedRecordCount}",
   "Failed {source.syncCounts.failed}",
   "Partial {source.syncCounts.partial}",
   "source.managementActions.map",
@@ -342,6 +353,38 @@ for (const snippet of [
   if (!privacyDataSection.includes(snippet)) {
     throw new Error(`Privacy data section is missing expected snippet: ${snippet}`);
   }
+}
+
+const deleteImportedDataAction = readFileSync(
+  path.join(root, "src/features/settings/actions/delete-imported-data.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "deleteImportedDataForSourceAction",
+  "initialDeleteImportedDataState",
+  "ActionResult",
+  "supabase.auth.getClaims",
+  ".from(\"import_sources\")",
+  ".from(\"import_records\")",
+  ".from(\"timeline_events\")",
+  ".eq(\"user_id\", userId)",
+  "lifecycle_state: \"deleted\"",
+  ".eq(\"source_type\", \"imported\")",
+  ".in(\"source_import_record_id\", recordIds)",
+  "importDeleteFailed",
+  "logImportError",
+  "revalidatePath(\"/imports\")",
+  "revalidatePath(\"/settings\")",
+  "revalidatePath(\"/timeline\")",
+]) {
+  if (!deleteImportedDataAction.includes(snippet)) {
+    throw new Error(`Delete imported data action is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/content_summary|source_metadata|story_text|note.*body|activity.*detail/i.test(deleteImportedDataAction)) {
+  throw new Error("Delete imported data action must not log or select sensitive imported content");
 }
 
 const timelinePage = readFileSync(
