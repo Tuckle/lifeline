@@ -1,5 +1,5 @@
 # generated: 2026-05-04T19:20:41+0300
-# last_updated: 2026-05-06T23:45:45+0300
+# last_updated: 2026-05-06T23:53:22+0300
 # project: lifeline
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: "2026-05-04T19:20:41+0300"
-last_updated: "2026-05-06T23:45:45+0300"
+last_updated: "2026-05-06T23:53:22+0300"
 project: lifeline
 project_key: NOKEY
 tracking_system: file-system
@@ -81,10 +81,10 @@ development_status:
   5-3-sync-drafts-when-connectivity-returns: done
   5-4-failed-sync-and-conflict-recovery: done
   epic-5-retrospective: optional
-  epic-6: in-progress
+  epic-6: done
   6-1-privacy-and-data-settings: done
   6-2-connected-source-permission-details: done
   6-3-disconnect-import-source: done
   6-4-delete-imported-data: done
-  6-5-export-timeline-data: backlog
+  6-5-export-timeline-data: done
   epic-6-retrospective: optional

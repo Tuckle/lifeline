@@ -78,6 +78,7 @@ const requiredPaths = [
   "src/features/reviews",
   "src/features/settings",
   "src/features/settings/actions/delete-imported-data.ts",
+  "src/features/settings/actions/export-lifeline-data.ts",
   "src/features/settings/components/privacy-data-section.tsx",
   "src/features/settings/queries/get-privacy-data-summary.ts",
   "src/features/offline",
@@ -346,6 +347,17 @@ for (const snippet of [
   "Deleting imported data...",
   "No data is shown as deleted until the",
   "Deleted {state.result.data.deletedRecordCount}",
+  "ExportDataControl",
+  "exportLifelineDataAction",
+  "initialExportLifelineDataState",
+  "Generate structured export",
+  "Export includes manual memories",
+  "content and imported context stay clearly labeled",
+  "Preparing export...",
+  "Export Lifeline JSON",
+  "Export failed",
+  "Export completed:",
+  "new Blob([result.data.jsonText]",
   "Failed {source.syncCounts.failed}",
   "Partial {source.syncCounts.partial}",
   "source.managementActions.map",
@@ -385,6 +397,47 @@ for (const snippet of [
 
 if (/content_summary|source_metadata|story_text|note.*body|activity.*detail/i.test(deleteImportedDataAction)) {
   throw new Error("Delete imported data action must not log or select sensitive imported content");
+}
+
+const exportLifelineDataAction = readFileSync(
+  path.join(root, "src/features/settings/actions/export-lifeline-data.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "exportLifelineDataAction",
+  "initialExportLifelineDataState",
+  "ActionResult",
+  "supabase.auth.getClaims",
+  ".from(\"timeline_events\")",
+  ".from(\"review_sessions\")",
+  ".from(\"reflection_patterns\")",
+  ".from(\"future_intentions\")",
+  ".from(\"import_sources\")",
+  ".from(\"import_records\")",
+  ".from(\"reflection_pattern_timeline_events\")",
+  ".from(\"future_intention_links\")",
+  ".eq(\"user_id\", userId)",
+  ".neq(\"status\", \"deleted\")",
+  ".neq(\"lifecycle_state\", \"deleted\")",
+  "source_metadata",
+  "lifecycle_state",
+  "source_import_record_id",
+  "importance",
+  "exportVersion",
+  "manualContent",
+  "importedContext",
+  "jsonText",
+  "exportFailed",
+  "lifeline_export_error",
+]) {
+  if (!exportLifelineDataAction.includes(snippet)) {
+    throw new Error(`Export Lifeline data action is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/app\/api\/export|route\.ts|public\/exports|opengraph|twitter-image|preview/i.test(exportLifelineDataAction)) {
+  throw new Error("Export must not create public routes, public files, metadata, or previews");
 }
 
 const timelinePage = readFileSync(

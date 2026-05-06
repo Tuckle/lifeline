@@ -10,7 +10,7 @@ import {
   Trash2,
   Unplug,
 } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,10 @@ import {
   deleteImportedDataForSourceAction,
   initialDeleteImportedDataState,
 } from "@/features/settings/actions/delete-imported-data";
+import {
+  exportLifelineDataAction,
+  initialExportLifelineDataState,
+} from "@/features/settings/actions/export-lifeline-data";
 import type { PrivacyDataSummary } from "@/features/settings/queries/get-privacy-data-summary";
 
 type PrivacyDataSectionProps = {
@@ -233,6 +237,7 @@ export function PrivacyDataSection({ summary }: PrivacyDataSectionProps) {
             </article>
           ))}
         </div>
+        <ExportDataControl />
       </section>
 
       {!data.hasConnectedSources ? (
@@ -265,6 +270,80 @@ function SummaryMetric({
       </div>
       <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
     </div>
+  );
+}
+
+function ExportDataControl() {
+  const [state, action, isPending] = useActionState(
+    exportLifelineDataAction,
+    initialExportLifelineDataState,
+  );
+  const result = state.result;
+
+  useEffect(() => {
+    if (!result?.ok) return;
+
+    const blob = new Blob([result.data.jsonText], {
+      type: "application/json;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = result.data.fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [result]);
+
+  return (
+    <article
+      className="rounded-md border border-border bg-card p-4 shadow-soft"
+      id="export-data-control"
+    >
+      <div className="flex items-start gap-3">
+        <Download
+          aria-hidden="true"
+          className="mt-1 size-4 text-muted-foreground"
+        />
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">
+            Generate structured export
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            Export includes manual memories, importance values, hidden
+            user-owned events, reflections, future intentions, source
+            references, and non-deleted imported context metadata. Manual
+            content and imported context stay clearly labeled in the JSON.
+          </p>
+        </div>
+      </div>
+      <form action={action} className="mt-3">
+        <Button disabled={isPending} type="submit" variant="outline">
+          <Download aria-hidden="true" className="size-4" />
+          {isPending ? "Preparing export..." : "Export Lifeline JSON"}
+        </Button>
+      </form>
+      {result && !result.ok ? (
+        <Alert className="mt-3" variant="warning">
+          <AlertTitle>Export failed</AlertTitle>
+          <AlertDescription>
+            {result.error.message} Retry when you are ready, or contact support
+            without including private memories, notes, or reflection text.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+      {result?.ok ? (
+        <div
+          className="mt-3 rounded-md border border-border bg-background p-3 text-sm leading-6 text-muted-foreground"
+          role="status"
+        >
+          Export completed: {result.data.fileName}. Included{" "}
+          {result.data.counts.timelineEvents} timeline event(s),{" "}
+          {result.data.counts.reviewSessions} reflection session(s),{" "}
+          {result.data.counts.futureIntentions} future intention(s), and{" "}
+          {result.data.counts.importRecords} imported record(s).
+        </div>
+      ) : null}
+    </article>
   );
 }
 
