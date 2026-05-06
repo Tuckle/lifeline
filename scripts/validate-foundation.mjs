@@ -18,6 +18,9 @@ const requiredPaths = [
   "src/features/timeline/components/memory-atlas-card.tsx",
   "src/features/timeline/queries/list-timeline-events.ts",
   "src/features/timeline/queries/search-timeline.ts",
+  "src/features/reviews/components/period-review-selector.tsx",
+  "src/features/reviews/components/period-review-surface.tsx",
+  "src/features/reviews/queries/get-period-review.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
@@ -225,9 +228,28 @@ for (const snippet of [
   "listTimelineEvents",
   "LifeLineTimeline",
   "TimelineSearchPanel",
+  "PeriodReviewSelector",
 ]) {
   if (!timelinePage.includes(snippet)) {
     throw new Error(`Timeline page is missing timeline integration: ${snippet}`);
+  }
+}
+
+const reflectPage = readFileSync(
+  path.join(root, "src/app/(workspace)/reflect/page.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "requireWorkspaceUser(\"/reflect\")",
+  "PeriodReviewSelector",
+  "PeriodReviewSurface",
+  "parsePeriodReviewParams",
+  "hasSelectedPeriod",
+  "getPeriodReview",
+  "Period could not load",
+]) {
+  if (!reflectPage.includes(snippet)) {
+    throw new Error(`Reflect page is missing expected period review behavior: ${snippet}`);
   }
 }
 
@@ -300,6 +322,24 @@ for (const snippet of [
 ]) {
   if (!searchTimelineQuery.includes(snippet)) {
     throw new Error(`Timeline search query is missing expected snippet: ${snippet}`);
+  }
+}
+
+const periodReviewQuery = readFileSync(
+  path.join(root, "src/features/reviews/queries/get-period-review.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "parsePeriodReviewParams",
+  "hasSelectedPeriod",
+  "getPeriodReview",
+  "searchTimeline",
+  "priorityEvents",
+  "supportingEvents",
+  "getPeriodLabel",
+]) {
+  if (!periodReviewQuery.includes(snippet)) {
+    throw new Error(`Period review query is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -448,6 +488,43 @@ for (const snippet of [
 ]) {
   if (!timelineSearchPanel.includes(snippet)) {
     throw new Error(`Timeline search panel is missing expected snippet: ${snippet}`);
+  }
+}
+
+const periodReviewSelector = readFileSync(
+  path.join(root, "src/features/reviews/components/period-review-selector.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "PeriodReviewSelector",
+  "Period review",
+  "Choose a life period",
+  "Review period",
+  "Clear period",
+  "Return to timeline",
+  "type=\"date\"",
+]) {
+  if (!periodReviewSelector.includes(snippet)) {
+    throw new Error(`Period review selector is missing expected snippet: ${snippet}`);
+  }
+}
+
+const periodReviewSurface = readFileSync(
+  path.join(root, "src/features/reviews/components/period-review-surface.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "PeriodReviewSurface",
+  "What is in this period",
+  "does not diagnose patterns",
+  "Priority memories",
+  "Strong signals first",
+  "LifeLineTimeline",
+  "Nothing is on this part of the line yet",
+  "Adjust period",
+]) {
+  if (!periodReviewSurface.includes(snippet)) {
+    throw new Error(`Period review surface is missing expected snippet: ${snippet}`);
   }
 }
 

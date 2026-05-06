@@ -1,5 +1,6 @@
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PeriodReviewSelector } from "@/features/reviews/components/period-review-selector";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
 import { TimelineSearchPanel } from "@/features/timeline/components/timeline-search-panel";
 import { listTimelineEvents } from "@/features/timeline/queries/list-timeline-events";
@@ -36,6 +37,11 @@ async function TimelineContent() {
         description="Start a private search or apply filters from the timeline. Results open with the life-line context preserved."
         filters={searchFilters}
         title="Find a memory or intention"
+      />
+      <PeriodReviewSelector
+        description="Choose dates from the timeline to open a focused review period, then return here when you are done."
+        selection={{ fromDate: "", toDate: "" }}
+        title="Review a period"
       />
       <LifeLineTimeline
         events={result.data.events}
