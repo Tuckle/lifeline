@@ -1,7 +1,9 @@
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
+import { TimelineSearchPanel } from "@/features/timeline/components/timeline-search-panel";
 import { listTimelineEvents } from "@/features/timeline/queries/list-timeline-events";
+import { parseTimelineSearchParams } from "@/features/timeline/queries/search-timeline";
 import { Suspense } from "react";
 
 export default function TimelinePage() {
@@ -25,11 +27,21 @@ async function TimelineContent() {
     );
   }
 
+  const searchFilters = parseTimelineSearchParams({});
+
   return (
-    <LifeLineTimeline
-      events={result.data.events}
-      futureIntentions={result.data.futureIntentions}
-      reachedInitialLimit={result.data.reachedInitialLimit}
-    />
+    <div className="grid gap-5">
+      <TimelineSearchPanel
+        activeFilterCount={0}
+        description="Start a private search or apply filters from the timeline. Results open with the life-line context preserved."
+        filters={searchFilters}
+        title="Find a memory or intention"
+      />
+      <LifeLineTimeline
+        events={result.data.events}
+        futureIntentions={result.data.futureIntentions}
+        reachedInitialLimit={result.data.reachedInitialLimit}
+      />
+    </div>
   );
 }

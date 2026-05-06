@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalendarPlus, Milestone } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { EmptyMemoryAtlasTimeline } from "@/features/timeline/components/empty-memory-atlas-timeline";
@@ -15,15 +16,27 @@ type LifeLineTimelineProps = {
   events: TimelineEventSummary[];
   futureIntentions: FutureIntentionSummary[];
   reachedInitialLimit: boolean;
+  emptyState?: ReactNode;
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  showAddAction?: boolean;
+  limitMessage?: string;
 };
 
 export function LifeLineTimeline({
   events,
   futureIntentions,
   reachedInitialLimit,
+  emptyState,
+  eyebrow = "Memory Atlas",
+  heading = "Your life-line",
+  description = "Memories sit above today for now. Future intentions will live below the present as you add them.",
+  showAddAction = true,
+  limitMessage = "Showing the first set of memories. Incremental loading will expand this as the timeline grows.",
 }: LifeLineTimelineProps) {
   if (events.length === 0 && futureIntentions.length === 0) {
-    return <EmptyMemoryAtlasTimeline />;
+    return emptyState ?? <EmptyMemoryAtlasTimeline />;
   }
 
   return (
@@ -33,26 +46,25 @@ export function LifeLineTimeline({
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
-          <p className="text-sm font-medium text-muted-foreground">
-            Memory Atlas
-          </p>
+          <p className="text-sm font-medium text-muted-foreground">{eyebrow}</p>
           <h1
             className="text-page-title font-semibold text-foreground"
             id="timeline-heading"
           >
-            Your life-line
+            {heading}
           </h1>
           <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
-            Memories sit above today for now. Future intentions will live below
-            the present as you add them.
+            {description}
           </p>
         </div>
-        <Button asChild className="w-full sm:w-fit">
-          <Link href="/add">
-            <CalendarPlus aria-hidden="true" className="size-4" />
-            Add memory
-          </Link>
-        </Button>
+        {showAddAction ? (
+          <Button asChild className="w-full sm:w-fit">
+            <Link href="/add">
+              <CalendarPlus aria-hidden="true" className="size-4" />
+              Add memory
+            </Link>
+          </Button>
+        ) : null}
       </div>
 
       <div className="relative mt-8">
@@ -138,8 +150,7 @@ export function LifeLineTimeline({
 
       {reachedInitialLimit ? (
         <p className="mt-6 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-foreground">
-          Showing the first set of memories. Incremental loading will expand
-          this as the timeline grows.
+          {limitMessage}
         </p>
       ) : null}
     </section>

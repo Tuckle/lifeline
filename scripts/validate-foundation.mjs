@@ -17,6 +17,7 @@ const requiredPaths = [
   "src/features/timeline/components/life-line-timeline.tsx",
   "src/features/timeline/components/memory-atlas-card.tsx",
   "src/features/timeline/queries/list-timeline-events.ts",
+  "src/features/timeline/queries/search-timeline.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
@@ -223,9 +224,29 @@ for (const snippet of [
   "requireWorkspaceUser(\"/timeline\")",
   "listTimelineEvents",
   "LifeLineTimeline",
+  "TimelineSearchPanel",
 ]) {
   if (!timelinePage.includes(snippet)) {
     throw new Error(`Timeline page is missing timeline integration: ${snippet}`);
+  }
+}
+
+const searchPage = readFileSync(
+  path.join(root, "src/app/(workspace)/search/page.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "requireWorkspaceUser(\"/search\")",
+  "TimelineSearchPanel",
+  "parseTimelineSearchParams",
+  "searchTimeline",
+  "LifeLineTimeline",
+  "Try a broader term",
+  "Clear filters",
+  "Searching private timeline",
+]) {
+  if (!searchPage.includes(snippet)) {
+    throw new Error(`Search page is missing expected search behavior: ${snippet}`);
   }
 }
 
@@ -259,6 +280,29 @@ for (const snippet of [
   }
 }
 
+const searchTimelineQuery = readFileSync(
+  path.join(root, "src/features/timeline/queries/search-timeline.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "SEARCH_RESULT_LIMIT = 1000",
+  "parseTimelineSearchParams",
+  "hasActiveTimelineSearchFilters",
+  "searchTimeline",
+  "supabase.auth.getClaims",
+  ".from(\"timeline_events\")",
+  ".from(\"future_intentions\")",
+  "ErrorCodes.permissionDenied",
+  "ErrorCodes.timelineSearchFailed",
+  "eventMatchesFilters",
+  "intentionMatchesFilters",
+  "matchesDateRange",
+]) {
+  if (!searchTimelineQuery.includes(snippet)) {
+    throw new Error(`Timeline search query is missing expected snippet: ${snippet}`);
+  }
+}
+
 const lifeLineTimeline = readFileSync(
   path.join(root, "src/features/timeline/components/life-line-timeline.tsx"),
   "utf8",
@@ -271,6 +315,7 @@ for (const snippet of [
   "Present",
   "Future space",
   "FutureIntentionCard",
+  "emptyState",
   "reachedInitialLimit",
   "Incremental loading",
 ]) {
@@ -381,6 +426,28 @@ for (const snippet of [
 ]) {
   if (!futureIntentionCard.includes(snippet)) {
     throw new Error(`Future intention card is missing expected snippet: ${snippet}`);
+  }
+}
+
+const timelineSearchPanel = readFileSync(
+  path.join(root, "src/features/timeline/components/timeline-search-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "TimelineSearchPanel",
+  "Private search",
+  "Search your life-line",
+  "type=\"search\"",
+  "type=\"date\"",
+  "name=\"importance\"",
+  "name=\"source\"",
+  "name=\"itemType\"",
+  "future-intention",
+  "Clear filters",
+  "min-h-11",
+]) {
+  if (!timelineSearchPanel.includes(snippet)) {
+    throw new Error(`Timeline search panel is missing expected snippet: ${snippet}`);
   }
 }
 

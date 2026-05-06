@@ -20,8 +20,10 @@ function isProtectedRoute(pathname: string) {
 
 function redirectToLogin(request: NextRequest) {
   const url = request.nextUrl.clone();
+  const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   url.pathname = "/auth/login";
-  url.searchParams.set("next", request.nextUrl.pathname);
+  url.search = "";
+  url.searchParams.set("next", nextPath);
   return NextResponse.redirect(url);
 }
 

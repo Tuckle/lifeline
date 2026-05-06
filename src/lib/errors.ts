@@ -6,6 +6,7 @@ export const ErrorCodes = {
   timelineEventHideFailed: "timeline_event_hide_failed",
   timelineEventDeleteFailed: "timeline_event_delete_failed",
   timelineEventNotFound: "timeline_event_not_found",
+  timelineSearchFailed: "timeline_search_failed",
   futureIntentionSaveFailed: "future_intention_save_failed",
   importAuthFailed: "import_auth_failed",
   offlineConflict: "offline_conflict",
