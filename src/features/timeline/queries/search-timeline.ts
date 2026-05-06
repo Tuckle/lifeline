@@ -1,6 +1,7 @@
 import type { ActionResult } from "@/lib/action-result";
 import { ErrorCodes } from "@/lib/errors";
 import { createClient } from "@/lib/supabase/server";
+import type { ReviewSessionSummary } from "@/features/reviews/queries/get-reflection-session";
 import { importanceValues } from "@/features/timeline/schemas/timeline-event-form";
 import type {
   FutureIntentionSummary,
@@ -12,6 +13,7 @@ export const SEARCH_RESULT_LIMIT = 1000;
 export const timelineItemTypeValues = [
   "all",
   "memory",
+  "reflection",
   "future-intention",
 ] as const;
 
@@ -51,6 +53,16 @@ type FutureIntentionRow = {
   target_label: string | null;
   status: string;
   created_at: string;
+};
+
+type ReviewSessionRow = {
+  id: string;
+  period_started_on: string | null;
+  period_ended_on: string | null;
+  summary_text: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export function parseTimelineSearchParams(
@@ -94,6 +106,7 @@ export async function searchTimeline(
   ActionResult<{
     events: TimelineEventSummary[];
     futureIntentions: FutureIntentionSummary[];
+    reviewSessions: ReviewSessionSummary[];
     reachedSearchLimit: boolean;
   }>
 > {
@@ -112,9 +125,13 @@ export async function searchTimeline(
 
   const shouldLoadEvents = filters.itemType !== "future-intention";
   const shouldLoadIntentions =
-    filters.itemType !== "memory" && filters.importance === "all";
+    !["memory", "reflection"].includes(filters.itemType) &&
+    filters.importance === "all";
+  const shouldLoadReviewSessions =
+    !["memory", "future-intention"].includes(filters.itemType) &&
+    filters.importance === "all";
 
-  const [eventsResult, intentionsResult] = await Promise.all([
+  const [eventsResult, intentionsResult, reviewSessionsResult] = await Promise.all([
     shouldLoadEvents
       ? supabase
           .from("timeline_events")
@@ -135,9 +152,16 @@ export async function searchTimeline(
           .order("created_at", { ascending: true })
           .limit(SEARCH_RESULT_LIMIT)
       : Promise.resolve({ data: [], error: null }),
+    shouldLoadReviewSessions
+      ? supabase
+          .from("review_sessions")
+          .select("id,period_started_on,period_ended_on,summary_text,status,created_at,updated_at")
+          .order("updated_at", { ascending: false })
+          .limit(SEARCH_RESULT_LIMIT)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
-  if (eventsResult.error || intentionsResult.error) {
+  if (eventsResult.error || intentionsResult.error || reviewSessionsResult.error) {
     return {
       ok: false,
       error: {
@@ -149,11 +173,15 @@ export async function searchTimeline(
 
   const eventRows = (eventsResult.data ?? []) as TimelineEventRow[];
   const intentionRows = (intentionsResult.data ?? []) as FutureIntentionRow[];
+  const reviewSessionRows = (reviewSessionsResult.data ?? []) as ReviewSessionRow[];
   const events = eventRows.map(mapTimelineEvent).filter((event) =>
     eventMatchesFilters(event, filters),
   );
   const futureIntentions = intentionRows.map(mapFutureIntention).filter(
     (intention) => intentionMatchesFilters(intention, filters),
+  );
+  const reviewSessions = reviewSessionRows.map(mapReviewSession).filter(
+    (session) => reviewSessionMatchesFilters(session, filters),
   );
 
   return {
@@ -161,9 +189,11 @@ export async function searchTimeline(
     data: {
       events,
       futureIntentions,
+      reviewSessions,
       reachedSearchLimit:
         eventRows.length === SEARCH_RESULT_LIMIT ||
-        intentionRows.length === SEARCH_RESULT_LIMIT,
+        intentionRows.length === SEARCH_RESULT_LIMIT ||
+        reviewSessionRows.length === SEARCH_RESULT_LIMIT,
     },
   };
 }
@@ -202,6 +232,21 @@ function intentionMatchesFilters(
   return matchesDateRange(intention.targetOn, filters);
 }
 
+function reviewSessionMatchesFilters(
+  session: ReviewSessionSummary,
+  filters: TimelineSearchFilters,
+) {
+  if (filters.query && !matchesText(reviewSessionSearchText(session), filters.query)) {
+    return false;
+  }
+
+  if (filters.source && !matchesText("Reflection", filters.source)) {
+    return false;
+  }
+
+  return matchesDateRange(session.periodStartedOn ?? session.periodEndedOn, filters);
+}
+
 function eventSearchText(event: TimelineEventSummary) {
   return [
     event.title,
@@ -222,6 +267,19 @@ function intentionSearchText(intention: FutureIntentionSummary) {
     intention.targetOn,
     intention.targetLabel,
     "future intention",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function reviewSessionSearchText(session: ReviewSessionSummary) {
+  return [
+    session.summaryText,
+    session.periodStartedOn,
+    session.periodEndedOn,
+    session.status,
+    "reflection",
+    "review session",
   ]
     .filter(Boolean)
     .join(" ");
@@ -311,5 +369,17 @@ function mapFutureIntention(row: FutureIntentionRow): FutureIntentionSummary {
     targetLabel: row.target_label,
     status: row.status,
     createdAt: row.created_at,
+  };
+}
+
+function mapReviewSession(row: ReviewSessionRow): ReviewSessionSummary {
+  return {
+    id: row.id,
+    periodStartedOn: row.period_started_on,
+    periodEndedOn: row.period_ended_on,
+    summaryText: row.summary_text,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }

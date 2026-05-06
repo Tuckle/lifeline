@@ -20,7 +20,11 @@ const requiredPaths = [
   "src/features/timeline/queries/search-timeline.ts",
   "src/features/reviews/components/period-review-selector.tsx",
   "src/features/reviews/components/period-review-surface.tsx",
+  "src/features/reviews/components/reflection-session-form.tsx",
   "src/features/reviews/queries/get-period-review.ts",
+  "src/features/reviews/queries/get-reflection-session.ts",
+  "src/features/reviews/actions/save-reflection-session.ts",
+  "src/features/reviews/schemas/reflection-session-form.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
   "src/features/timeline/actions/create-timeline-event.ts",
@@ -58,6 +62,7 @@ const requiredPaths = [
   "supabase/migrations/20260505182600_create_timeline_events.sql",
   "supabase/migrations/20260505201400_add_photo_references_to_timeline_events.sql",
   "supabase/migrations/20260505210800_create_future_intentions.sql",
+  "supabase/migrations/20260506102400_create_review_sessions.sql",
   "supabase/migrations",
 ];
 
@@ -266,6 +271,8 @@ for (const snippet of [
   "Try a broader term",
   "Clear filters",
   "Searching private timeline",
+  "ReflectionSearchResults",
+  "Saved reflections",
 ]) {
   if (!searchPage.includes(snippet)) {
     throw new Error(`Search page is missing expected search behavior: ${snippet}`);
@@ -314,10 +321,12 @@ for (const snippet of [
   "supabase.auth.getClaims",
   ".from(\"timeline_events\")",
   ".from(\"future_intentions\")",
+  ".from(\"review_sessions\")",
   "ErrorCodes.permissionDenied",
   "ErrorCodes.timelineSearchFailed",
   "eventMatchesFilters",
   "intentionMatchesFilters",
+  "reviewSessionMatchesFilters",
   "matchesDateRange",
 ]) {
   if (!searchTimelineQuery.includes(snippet)) {
@@ -522,9 +531,84 @@ for (const snippet of [
   "LifeLineTimeline",
   "Nothing is on this part of the line yet",
   "Adjust period",
+  "Start reflection",
+  "Saved reflections",
 ]) {
   if (!periodReviewSurface.includes(snippet)) {
     throw new Error(`Period review surface is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionSessionRoute = readFileSync(
+  path.join(root, "src/app/(workspace)/reflect/session/page.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "requireWorkspaceUser(\"/reflect/session\")",
+  "ReflectionSessionForm",
+  "parsePeriodReviewParams",
+  "getReflectionSessionForPeriod",
+  "Reflection could not load",
+]) {
+  if (!reflectionSessionRoute.includes(snippet)) {
+    throw new Error(`Reflection session route is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionSessionForm = readFileSync(
+  path.join(root, "src/features/reviews/components/reflection-session-form.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "ReflectionSessionForm",
+  "Optional prompts",
+  "What happened during this period?",
+  "What repeated, changed, or surprised you?",
+  "Local draft is in this editor",
+  "Save draft",
+  "Pause",
+  "Complete",
+  "Back to period",
+]) {
+  if (!reflectionSessionForm.includes(snippet)) {
+    throw new Error(`Reflection session form is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionSessionAction = readFileSync(
+  path.join(root, "src/features/reviews/actions/save-reflection-session.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "saveReflectionSessionAction",
+  "reflectionSessionFormSchema.safeParse",
+  ".from(\"review_sessions\")",
+  ".insert",
+  ".update",
+  "ErrorCodes.reflectionSessionSaveFailed",
+  "revalidatePath(\"/reflect\")",
+  "revalidatePath(\"/search\")",
+]) {
+  if (!reflectionSessionAction.includes(snippet)) {
+    throw new Error(`Reflection session action is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionSessionSchema = readFileSync(
+  path.join(root, "src/features/reviews/schemas/reflection-session-form.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "reflectionSessionFormSchema",
+  "draft",
+  "paused",
+  "completed",
+  "summaryText",
+  "Write a short summary before completing",
+]) {
+  if (!reflectionSessionSchema.includes(snippet)) {
+    throw new Error(`Reflection session schema is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -834,6 +918,29 @@ for (const snippet of [
 ]) {
   if (!futureIntentionsMigration.includes(snippet)) {
     throw new Error(`Future intentions migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reviewSessionsMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260506102400_create_review_sessions.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "create table if not exists public.review_sessions",
+  "user_id uuid not null references auth.users(id) on delete cascade",
+  "period_started_on",
+  "period_ended_on",
+  "summary_text",
+  "status in ('draft', 'paused', 'completed')",
+  "alter table public.review_sessions enable row level security",
+  "auth.uid() = user_id",
+  "review_sessions_select_own",
+  "review_sessions_insert_own",
+  "review_sessions_update_own",
+  "review_sessions_delete_own",
+]) {
+  if (!reviewSessionsMigration.includes(snippet)) {
+    throw new Error(`Review sessions migration is missing expected snippet: ${snippet}`);
   }
 }
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
+import type { ReviewSessionSummary } from "@/features/reviews/queries/get-reflection-session";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
 import { TimelineSearchPanel } from "@/features/timeline/components/timeline-search-panel";
 import {
@@ -51,7 +52,9 @@ async function SearchContent({
   }
 
   const totalResults =
-    result.data.events.length + result.data.futureIntentions.length;
+    result.data.events.length +
+    result.data.futureIntentions.length +
+    result.data.reviewSessions.length;
 
   return (
     <div className="grid gap-5">
@@ -59,6 +62,8 @@ async function SearchContent({
         activeFilterCount={getActiveFilterCount(filters)}
         filters={filters}
       />
+
+      <ReflectionSearchResults reviewSessions={result.data.reviewSessions} />
 
       <LifeLineTimeline
         description={
@@ -76,6 +81,40 @@ async function SearchContent({
         showAddAction={false}
       />
     </div>
+  );
+}
+
+function ReflectionSearchResults({
+  reviewSessions,
+}: {
+  reviewSessions: ReviewSessionSummary[];
+}) {
+  if (reviewSessions.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-md border border-border bg-card p-5 text-card-foreground shadow-soft">
+      <p className="text-sm font-medium text-muted-foreground">
+        Reflection results
+      </p>
+      <h2 className="mt-2 text-section-title font-semibold text-foreground">
+        Saved reflections
+      </h2>
+      <ul className="mt-4 grid gap-3">
+        {reviewSessions.map((session) => (
+          <li className="rounded-md border border-border bg-background p-4" key={session.id}>
+            <p className="text-sm font-semibold text-foreground">
+              {session.periodStartedOn ?? "Open start"} to{" "}
+              {session.periodEndedOn ?? "open end"} · {session.status}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {session.summaryText || "Saved reflection without text yet."}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

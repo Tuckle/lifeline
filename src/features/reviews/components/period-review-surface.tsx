@@ -9,14 +9,17 @@ import type {
   PeriodReviewResult,
   PeriodReviewSelection,
 } from "@/features/reviews/queries/get-period-review";
+import type { ReviewSessionSummary } from "@/features/reviews/queries/get-reflection-session";
 
 type PeriodReviewSurfaceProps = {
   review: PeriodReviewResult;
+  reviewSessions: ReviewSessionSummary[];
   selection: PeriodReviewSelection;
 };
 
 export function PeriodReviewSurface({
   review,
+  reviewSessions,
   selection,
 }: PeriodReviewSurfaceProps) {
   const totalItems = review.events.length + review.futureIntentions.length;
@@ -58,12 +61,44 @@ export function PeriodReviewSurface({
               </Link>
             </Button>
             <Button asChild>
-              <Link href={`/reflect?from=${selection.fromDate}&to=${selection.toDate}`}>
+              <Link href={`/reflect/session?from=${selection.fromDate}&to=${selection.toDate}`}>
                 <PenLine aria-hidden="true" className="size-4" />
-                Keep reviewing
+                Start reflection
               </Link>
             </Button>
           </div>
+        </section>
+
+        <section className="rounded-md border border-border bg-card p-5 text-card-foreground shadow-soft">
+          <p className="text-sm font-medium text-muted-foreground">
+            Saved reflections
+          </p>
+          <h2 className="mt-2 text-section-title font-semibold text-foreground">
+            Notes from this period
+          </h2>
+          {reviewSessions.length > 0 ? (
+            <ul className="mt-4 grid gap-3">
+              {reviewSessions.map((session) => (
+                <li
+                  className="rounded-md border border-border bg-background p-3"
+                  key={session.id}
+                >
+                  <p className="text-sm font-semibold text-foreground">
+                    {session.status === "completed"
+                      ? "Completed reflection"
+                      : "Reflection draft"}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {session.summaryText || "Draft saved without text yet."}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 rounded-md border border-dashed border-border bg-background p-3 text-sm text-muted-foreground">
+              No reflection has been saved for this period yet.
+            </p>
+          )}
         </section>
 
         <section className="rounded-md border border-border bg-card p-5 text-card-foreground shadow-soft">
