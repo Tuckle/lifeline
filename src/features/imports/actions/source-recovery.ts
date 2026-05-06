@@ -36,8 +36,9 @@ async function updateImportSourceStatus(
 ): Promise<ActionResult<{ sourceId: string }>> {
   const supabase = await createClient();
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims?.sub;
 
-  if (claimsError || !claimsData?.claims?.sub) {
+  if (claimsError || !userId) {
     return {
       ok: false,
       error: {
@@ -50,7 +51,10 @@ async function updateImportSourceStatus(
   const { error } = await supabase
     .from("import_sources")
     .update({ connection_status: connectionStatus })
-    .eq("id", sourceId);
+    .eq("id", sourceId)
+    .eq("user_id", userId)
+    .select("id")
+    .single();
 
   if (error) {
     return {
@@ -64,5 +68,6 @@ async function updateImportSourceStatus(
   }
 
   revalidatePath("/imports");
+  revalidatePath("/settings");
   return { ok: true, data: { sourceId } };
 }

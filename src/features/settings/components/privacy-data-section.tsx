@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Database,
@@ -8,11 +10,26 @@ import {
   Trash2,
   Unplug,
 } from "lucide-react";
+import { useActionState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import type { ActionResult } from "@/lib/action-result";
+import {
+  disconnectImportSourceAction,
+  initialSourceRecoveryState,
+} from "@/features/imports/actions/source-recovery";
 import type { PrivacyDataSummary } from "@/features/settings/queries/get-privacy-data-summary";
 
 type PrivacyDataSectionProps = {
@@ -318,8 +335,72 @@ function SourcePermissionDetails({
             <Link href={getManagementActionHref(action)}>{action}</Link>
           </Button>
         ))}
+        <DisconnectSourceControl source={source} />
       </div>
     </div>
+  );
+}
+
+function DisconnectSourceControl({
+  source,
+}: {
+  source: PrivacyDataSummary["sources"][number];
+}) {
+  const [state, action, isPending] = useActionState(
+    disconnectImportSourceAction,
+    initialSourceRecoveryState,
+  );
+  const isDisconnected = source.connectionStatus === "disconnected";
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button disabled={isDisconnected} type="button" variant="outline">
+          <Unplug aria-hidden="true" className="size-4" />
+          Disconnect source
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Disconnect {source.displayName}</DialogTitle>
+          <DialogDescription>
+            Future sync and source access will stop for this source. Already
+            imported records stay in Lifeline with their current staged,
+            promoted, attached, hidden, or discarded state unless you delete
+            imported data separately.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="rounded-md border border-border bg-background p-3 text-sm leading-6 text-muted-foreground">
+          Manual memories, reflections, and future intentions are separate from
+          this source and will not be changed by disconnecting it.
+        </div>
+        <form action={action} className="grid gap-3">
+          <input name="sourceId" type="hidden" value={source.id} />
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button disabled={isPending} type="button" variant="outline">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button disabled={isPending} type="submit" variant="destructive">
+              {isPending ? "Disconnecting..." : "Disconnect source"}
+            </Button>
+          </DialogFooter>
+        </form>
+        {state.result && !state.result.ok ? (
+          <p className="text-sm text-destructive" role="alert">
+            {state.result.error.message} The source has not changed; try again
+            when you are ready.
+          </p>
+        ) : null}
+        {state.result?.ok ? (
+          <p className="text-sm text-muted-foreground" role="status">
+            Source disconnected. Existing imported records remain available for
+            review and future delete controls.
+          </p>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }
 
