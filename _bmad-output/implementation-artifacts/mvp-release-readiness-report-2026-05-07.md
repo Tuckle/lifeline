@@ -59,6 +59,7 @@ Commands passed:
 - `npm run lint`
 - `npm audit --omit=dev`
 - `npm run build`
+- `npm run smoke`
 - `git diff --check`
 
 Production route smoke checks passed:
@@ -66,6 +67,14 @@ Production route smoke checks passed:
 - `/` redirects unauthenticated users to `/auth/login`.
 - `/auth/login?next=%2Ftimeline` returns `200 OK`.
 - `/timeline`, `/add`, `/imports`, `/reflect`, `/search`, and `/settings` redirect unauthenticated users to login with the expected `next` path.
+
+## Hardening Added
+
+After the initial readiness pass, a repeatable production route smoke script was added:
+
+- `scripts/smoke-routes.mjs` starts the built Next app and verifies unauthenticated root/login/workspace route behavior.
+- `npm run smoke` runs the route smoke checks locally or in CI after `npm run build`.
+- CI now runs build plus smoke checks after typecheck, lint, and the foundation validator.
 
 ## Open Gates Before Beta Users
 

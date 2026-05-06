@@ -106,7 +106,7 @@ if (missing.length > 0) {
 
 const packageJson = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
 const scripts = packageJson.scripts ?? {};
-const requiredScripts = ["dev", "lint", "typecheck", "test"];
+const requiredScripts = ["dev", "lint", "typecheck", "smoke", "test"];
 const missingScripts = requiredScripts.filter((script) => !scripts[script]);
 
 if (missingScripts.length > 0) {
@@ -142,9 +142,30 @@ for (const snippet of ["ok: true", "ok: false", "code: string", "field?: string"
 }
 
 const ci = readFileSync(path.join(root, ".github/workflows/ci.yml"), "utf8");
-for (const snippet of ["actions/setup-node", "npm ci", "npm run typecheck", "npm run lint", "npm test"]) {
+for (const snippet of [
+  "actions/setup-node",
+  "npm ci",
+  "npm run typecheck",
+  "npm run lint",
+  "npm test",
+  "npm run build",
+  "npm run smoke",
+]) {
   if (!ci.includes(snippet)) {
     throw new Error(`CI workflow is missing expected snippet: ${snippet}`);
+  }
+}
+
+const smokeRoutes = readFileSync(path.join(root, "scripts/smoke-routes.mjs"), "utf8");
+for (const snippet of [
+  "Production route smoke checks passed",
+  "Missing .next build output",
+  "/auth/login?next=%2Ftimeline",
+  "[\"/timeline\", \"/add\", \"/imports\", \"/reflect\", \"/search\", \"/settings\"]",
+  "redirect: \"manual\"",
+]) {
+  if (!smokeRoutes.includes(snippet)) {
+    throw new Error(`Smoke route script is missing expected snippet: ${snippet}`);
   }
 }
 

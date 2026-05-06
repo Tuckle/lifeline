@@ -6,6 +6,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "smoke": "node scripts/smoke-routes.mjs",
     "test": "node scripts/validate-foundation.mjs"
   },
   "dependencies": {
