@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImportStagingCard } from "@/features/imports/components/import-staging-card";
+import { NotesImportPanel } from "@/features/imports/components/notes-import-panel";
 import { RescueTimeConnectPanel } from "@/features/imports/components/rescuetime-connect-panel";
 import type {
   ImportRecordSummary,
@@ -60,8 +61,8 @@ export function ImportReviewSurface({
             Bring in context carefully.
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Connectors arrive in the next stories. The staging area is ready to
-            keep imported records separate and reviewable.
+            RescueTime and notes imports use narrow MVP paths first. The
+            staging area keeps imported records separate and reviewable.
           </p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row xl:flex-col 2xl:flex-row">
             <Button asChild variant="outline">
@@ -80,6 +81,7 @@ export function ImportReviewSurface({
         </section>
 
         <RescueTimeConnectPanel />
+        <NotesImportPanel />
 
         {sources.length > 0 ? (
           <section

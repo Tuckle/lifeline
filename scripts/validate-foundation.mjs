@@ -32,8 +32,11 @@ const requiredPaths = [
   "src/features/reviews/schemas/reflection-session-form.ts",
   "src/features/imports/components/import-review-surface.tsx",
   "src/features/imports/components/import-staging-card.tsx",
+  "src/features/imports/components/notes-import-panel.tsx",
   "src/features/imports/components/rescuetime-connect-panel.tsx",
+  "src/features/imports/actions/notes-import.ts",
   "src/features/imports/actions/rescuetime-import.ts",
+  "src/features/imports/notes/parse-notes-export.ts",
   "src/features/imports/queries/list-import-review.ts",
   "src/features/imports/logger.ts",
   "src/features/imports/rescuetime/client.ts",
@@ -583,6 +586,7 @@ for (const snippet of [
   "Connect RescueTime",
   "Import notes",
   "ImportStagingCard",
+  "NotesImportPanel",
   "RescueTimeConnectPanel",
   "No staged imports yet",
 ]) {
@@ -609,6 +613,77 @@ for (const snippet of [
 ]) {
   if (!importStagingCard.includes(snippet)) {
     throw new Error(`Import staging card is missing expected snippet: ${snippet}`);
+  }
+}
+
+const notesImportPanel = readFileSync(
+  path.join(root, "src/features/imports/components/notes-import-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "NotesImportPanel",
+  "Import written context",
+  "copied text or an exported plain-text/Markdown",
+  "copies the content into your private staged records",
+  "does not connect to Notion or Google Keep yet",
+  "Date: YYYY-MM-DD",
+  "Separate multiple notes",
+  "date review needed",
+  "importNotesAction",
+  "Import notes to staging",
+  "retry this paste",
+]) {
+  if (!notesImportPanel.includes(snippet)) {
+    throw new Error(`Notes import panel is missing expected snippet: ${snippet}`);
+  }
+}
+
+const notesImportAction = readFileSync(
+  path.join(root, "src/features/imports/actions/notes-import.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "importNotesAction",
+  "parseNotesExport",
+  ".from(\"import_sources\")",
+  ".from(\"import_records\")",
+  "source_type: \"notes\"",
+  "source_metadata: note.sourceMetadata",
+  "lifecycle_state: \"staged\"",
+  "sync_status: parsed.failedCount > 0 ? \"partial\" : \"succeeded\"",
+  "onConflict: \"user_id,source_type,source_record_id\"",
+  "copiedIntoLifeline",
+  "logImportError",
+  "revalidatePath(\"/imports\")",
+]) {
+  if (!notesImportAction.includes(snippet)) {
+    throw new Error(`Notes import action is missing expected snippet: ${snippet}`);
+  }
+}
+
+if (/\.from\(\"timeline_events\"\)|console\.(log|error)\([^)]*(notesText|body|contentSummary|title)/i.test(notesImportAction)) {
+  throw new Error("Notes import action must avoid timeline auto-promotion and note content logging");
+}
+
+const notesExportParser = readFileSync(
+  path.join(root, "src/features/imports/notes/parse-notes-export.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "parseNotesExport",
+  "ParsedNoteImport",
+  "split(/\\n-{3,}\\n/g)",
+  "/^date:\\s*/i",
+  "needsDateReview",
+  "sourceRecordId: `notes:",
+  "sourceMetadata",
+  "body",
+  "dateReview",
+  "Needs date review",
+]) {
+  if (!notesExportParser.includes(snippet)) {
+    throw new Error(`Notes export parser is missing expected snippet: ${snippet}`);
   }
 }
 
