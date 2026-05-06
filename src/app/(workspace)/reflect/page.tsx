@@ -7,6 +7,7 @@ import {
   hasSelectedPeriod,
   parsePeriodReviewParams,
 } from "@/features/reviews/queries/get-period-review";
+import { listReflectionPatternsForPeriod } from "@/features/reviews/queries/get-reflection-patterns";
 import { listReviewSessionsForPeriod } from "@/features/reviews/queries/get-reflection-session";
 import { Suspense } from "react";
 
@@ -36,9 +37,10 @@ async function ReflectContent({
     return <PeriodReviewSelector selection={selection} showTimelineReturn />;
   }
 
-  const [result, sessionsResult] = await Promise.all([
+  const [result, sessionsResult, patternsResult] = await Promise.all([
     getPeriodReview(selection),
     listReviewSessionsForPeriod(selection),
+    listReflectionPatternsForPeriod(selection),
   ]);
 
   if (!result.ok) {
@@ -65,10 +67,23 @@ async function ReflectContent({
     );
   }
 
+  if (!patternsResult.ok) {
+    return (
+      <div className="grid gap-5">
+        <PeriodReviewSelector selection={selection} showTimelineReturn />
+        <Alert variant="destructive">
+          <AlertTitle>Period could not load</AlertTitle>
+          <AlertDescription>{patternsResult.error.message}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-5">
       <PeriodReviewSelector selection={selection} showTimelineReturn />
       <PeriodReviewSurface
+        patterns={patternsResult.data}
         review={result.data}
         reviewSessions={sessionsResult.data}
         selection={selection}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
+import type { ReflectionPatternSummary } from "@/features/reviews/queries/get-reflection-patterns";
 import type { ReviewSessionSummary } from "@/features/reviews/queries/get-reflection-session";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
 import { TimelineSearchPanel } from "@/features/timeline/components/timeline-search-panel";
@@ -54,7 +55,8 @@ async function SearchContent({
   const totalResults =
     result.data.events.length +
     result.data.futureIntentions.length +
-    result.data.reviewSessions.length;
+    result.data.reviewSessions.length +
+    result.data.patterns.length;
 
   return (
     <div className="grid gap-5">
@@ -64,6 +66,7 @@ async function SearchContent({
       />
 
       <ReflectionSearchResults reviewSessions={result.data.reviewSessions} />
+      <PatternSearchResults patterns={result.data.patterns} />
 
       <LifeLineTimeline
         description={
@@ -81,6 +84,39 @@ async function SearchContent({
         showAddAction={false}
       />
     </div>
+  );
+}
+
+function PatternSearchResults({
+  patterns,
+}: {
+  patterns: ReflectionPatternSummary[];
+}) {
+  if (patterns.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-md border border-border bg-card p-5 text-card-foreground shadow-soft">
+      <p className="text-sm font-medium text-muted-foreground">
+        Pattern results
+      </p>
+      <h2 className="mt-2 text-section-title font-semibold text-foreground">
+        User-authored insights
+      </h2>
+      <ul className="mt-4 grid gap-3">
+        {patterns.map((pattern) => (
+          <li className="rounded-md border border-border bg-background p-4" key={pattern.id}>
+            <p className="text-sm font-semibold text-foreground">
+              {pattern.title} · {pattern.authorState === "user_authored" ? "User-authored" : "User-confirmed"}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {pattern.description || "Saved without extra notes."}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

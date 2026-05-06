@@ -20,10 +20,14 @@ const requiredPaths = [
   "src/features/timeline/queries/search-timeline.ts",
   "src/features/reviews/components/period-review-selector.tsx",
   "src/features/reviews/components/period-review-surface.tsx",
+  "src/features/reviews/components/pattern-clarity-panel.tsx",
   "src/features/reviews/components/reflection-session-form.tsx",
   "src/features/reviews/queries/get-period-review.ts",
+  "src/features/reviews/queries/get-reflection-patterns.ts",
   "src/features/reviews/queries/get-reflection-session.ts",
+  "src/features/reviews/actions/save-reflection-pattern.ts",
   "src/features/reviews/actions/save-reflection-session.ts",
+  "src/features/reviews/schemas/reflection-pattern-form.ts",
   "src/features/reviews/schemas/reflection-session-form.ts",
   "src/features/timeline/types.ts",
   "src/app/(workspace)/add/page.tsx",
@@ -63,6 +67,7 @@ const requiredPaths = [
   "supabase/migrations/20260505201400_add_photo_references_to_timeline_events.sql",
   "supabase/migrations/20260505210800_create_future_intentions.sql",
   "supabase/migrations/20260506102400_create_review_sessions.sql",
+  "supabase/migrations/20260506103600_create_reflection_patterns.sql",
   "supabase/migrations",
 ];
 
@@ -272,7 +277,9 @@ for (const snippet of [
   "Clear filters",
   "Searching private timeline",
   "ReflectionSearchResults",
+  "PatternSearchResults",
   "Saved reflections",
+  "User-authored insights",
 ]) {
   if (!searchPage.includes(snippet)) {
     throw new Error(`Search page is missing expected search behavior: ${snippet}`);
@@ -322,11 +329,13 @@ for (const snippet of [
   ".from(\"timeline_events\")",
   ".from(\"future_intentions\")",
   ".from(\"review_sessions\")",
+  ".from(\"reflection_patterns\")",
   "ErrorCodes.permissionDenied",
   "ErrorCodes.timelineSearchFailed",
   "eventMatchesFilters",
   "intentionMatchesFilters",
   "reviewSessionMatchesFilters",
+  "patternMatchesFilters",
   "matchesDateRange",
 ]) {
   if (!searchTimelineQuery.includes(snippet)) {
@@ -349,6 +358,24 @@ for (const snippet of [
 ]) {
   if (!periodReviewQuery.includes(snippet)) {
     throw new Error(`Period review query is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionPatternsQuery = readFileSync(
+  path.join(root, "src/features/reviews/queries/get-reflection-patterns.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "listReflectionPatternsForPeriod",
+  ".from(\"reflection_patterns\")",
+  ".from(\"reflection_pattern_timeline_events\")",
+  "timeline_events(id,title)",
+  "linkedEvents",
+  "author_state",
+  "ErrorCodes.reflectionPatternSaveFailed",
+]) {
+  if (!reflectionPatternsQuery.includes(snippet)) {
+    throw new Error(`Reflection patterns query is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -533,9 +560,31 @@ for (const snippet of [
   "Adjust period",
   "Start reflection",
   "Saved reflections",
+  "PatternClarityPanel",
 ]) {
   if (!periodReviewSurface.includes(snippet)) {
     throw new Error(`Period review surface is missing expected snippet: ${snippet}`);
+  }
+}
+
+const patternClarityPanel = readFileSync(
+  path.join(root, "src/features/reviews/components/pattern-clarity-panel.tsx"),
+  "utf8",
+);
+for (const snippet of [
+  "PatternClarityPanel",
+  "Pattern clarity",
+  "User-authored",
+  "not a diagnosis",
+  "Possible pattern prompt",
+  "You can ignore this prompt",
+  "Supporting memories",
+  "Edit or dismiss pattern",
+  "Dismiss pattern",
+  "Pattern synced",
+]) {
+  if (!patternClarityPanel.includes(snippet)) {
+    throw new Error(`Pattern clarity panel is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -546,12 +595,50 @@ const reflectionSessionRoute = readFileSync(
 for (const snippet of [
   "requireWorkspaceUser(\"/reflect/session\")",
   "ReflectionSessionForm",
+  "PatternClarityPanel",
   "parsePeriodReviewParams",
+  "listReflectionPatternsForPeriod",
   "getReflectionSessionForPeriod",
   "Reflection could not load",
 ]) {
   if (!reflectionSessionRoute.includes(snippet)) {
     throw new Error(`Reflection session route is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionPatternAction = readFileSync(
+  path.join(root, "src/features/reviews/actions/save-reflection-pattern.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "\"use server\"",
+  "saveReflectionPatternAction",
+  "dismissReflectionPatternAction",
+  "reflectionPatternFormSchema.safeParse",
+  ".from(\"reflection_patterns\")",
+  ".from(\"reflection_pattern_timeline_events\")",
+  "status: \"dismissed\"",
+  "ErrorCodes.reflectionPatternSaveFailed",
+  "revalidatePath(\"/reflect\")",
+  "revalidatePath(\"/search\")",
+]) {
+  if (!reflectionPatternAction.includes(snippet)) {
+    throw new Error(`Reflection pattern action is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionPatternSchema = readFileSync(
+  path.join(root, "src/features/reviews/schemas/reflection-pattern-form.ts"),
+  "utf8",
+);
+for (const snippet of [
+  "reflectionPatternFormSchema",
+  "Name the insight in your own words",
+  "description",
+  "linkedTimelineEventIds",
+]) {
+  if (!reflectionPatternSchema.includes(snippet)) {
+    throw new Error(`Reflection pattern schema is missing expected snippet: ${snippet}`);
   }
 }
 
@@ -941,6 +1028,28 @@ for (const snippet of [
 ]) {
   if (!reviewSessionsMigration.includes(snippet)) {
     throw new Error(`Review sessions migration is missing expected snippet: ${snippet}`);
+  }
+}
+
+const reflectionPatternsMigration = readFileSync(
+  path.join(root, "supabase/migrations/20260506103600_create_reflection_patterns.sql"),
+  "utf8",
+);
+for (const snippet of [
+  "create table if not exists public.reflection_patterns",
+  "create table if not exists public.reflection_pattern_timeline_events",
+  "user_id uuid not null references auth.users(id) on delete cascade",
+  "author_state in ('user_authored', 'user_confirmed')",
+  "status in ('active', 'dismissed')",
+  "alter table public.reflection_patterns enable row level security",
+  "alter table public.reflection_pattern_timeline_events enable row level security",
+  "reflection_patterns_select_own",
+  "reflection_patterns_insert_own",
+  "reflection_patterns_update_own",
+  "reflection_pattern_events_insert_own",
+]) {
+  if (!reflectionPatternsMigration.includes(snippet)) {
+    throw new Error(`Reflection patterns migration is missing expected snippet: ${snippet}`);
   }
 }
 

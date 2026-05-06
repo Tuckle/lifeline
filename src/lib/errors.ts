@@ -9,6 +9,7 @@ export const ErrorCodes = {
   timelineSearchFailed: "timeline_search_failed",
   futureIntentionSaveFailed: "future_intention_save_failed",
   reflectionSessionSaveFailed: "reflection_session_save_failed",
+  reflectionPatternSaveFailed: "reflection_pattern_save_failed",
   importAuthFailed: "import_auth_failed",
   offlineConflict: "offline_conflict",
 } as const;

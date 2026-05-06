@@ -127,6 +127,7 @@ export function TimelineSearchPanel({
               <option value="all">Memories and intentions</option>
               <option value="memory">Memories only</option>
               <option value="reflection">Reflections only</option>
+              <option value="pattern">Patterns only</option>
               <option value="future-intention">Future intentions only</option>
             </select>
           </div>

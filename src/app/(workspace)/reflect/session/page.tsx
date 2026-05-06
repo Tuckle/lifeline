@@ -3,12 +3,15 @@ import { Suspense } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { requireWorkspaceUser } from "@/features/auth/require-workspace-user";
+import { PatternClarityPanel } from "@/features/reviews/components/pattern-clarity-panel";
 import { ReflectionSessionForm } from "@/features/reviews/components/reflection-session-form";
 import {
+  getPeriodReview,
   getPeriodLabel,
   hasSelectedPeriod,
   parsePeriodReviewParams,
 } from "@/features/reviews/queries/get-period-review";
+import { listReflectionPatternsForPeriod } from "@/features/reviews/queries/get-reflection-patterns";
 import { getReflectionSessionForPeriod } from "@/features/reviews/queries/get-reflection-session";
 
 type ReflectionSessionPageProps = {
@@ -38,7 +41,11 @@ async function ReflectionSessionContent({
     redirect("/reflect");
   }
 
-  const result = await getReflectionSessionForPeriod(selection);
+  const [result, reviewResult, patternsResult] = await Promise.all([
+    getReflectionSessionForPeriod(selection),
+    getPeriodReview(selection),
+    listReflectionPatternsForPeriod(selection),
+  ]);
 
   if (!result.ok) {
     return (
@@ -49,11 +56,37 @@ async function ReflectionSessionContent({
     );
   }
 
+  if (!reviewResult.ok) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Reflection could not load</AlertTitle>
+        <AlertDescription>{reviewResult.error.message}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!patternsResult.ok) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Reflection could not load</AlertTitle>
+        <AlertDescription>{patternsResult.error.message}</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <ReflectionSessionForm
-      existingSession={result.data}
-      periodLabel={getPeriodLabel(selection)}
-      selection={selection}
-    />
+    <div className="grid gap-5">
+      <ReflectionSessionForm
+        existingSession={result.data}
+        periodLabel={getPeriodLabel(selection)}
+        selection={selection}
+      />
+      <PatternClarityPanel
+        events={reviewResult.data.events}
+        patterns={patternsResult.data}
+        reviewSessionId={result.data?.id}
+        selection={selection}
+      />
+    </div>
   );
 }

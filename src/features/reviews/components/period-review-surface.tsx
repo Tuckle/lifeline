@@ -5,19 +5,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LifeLineTimeline } from "@/features/timeline/components/life-line-timeline";
 import { formatImportanceLabel } from "@/features/timeline/components/importance-control";
+import { PatternClarityPanel } from "@/features/reviews/components/pattern-clarity-panel";
 import type {
   PeriodReviewResult,
   PeriodReviewSelection,
 } from "@/features/reviews/queries/get-period-review";
+import type { ReflectionPatternSummary } from "@/features/reviews/queries/get-reflection-patterns";
 import type { ReviewSessionSummary } from "@/features/reviews/queries/get-reflection-session";
 
 type PeriodReviewSurfaceProps = {
+  patterns: ReflectionPatternSummary[];
   review: PeriodReviewResult;
   reviewSessions: ReviewSessionSummary[];
   selection: PeriodReviewSelection;
 };
 
 export function PeriodReviewSurface({
+  patterns,
   review,
   reviewSessions,
   selection,
@@ -68,6 +72,12 @@ export function PeriodReviewSurface({
             </Button>
           </div>
         </section>
+
+        <PatternClarityPanel
+          events={review.events}
+          patterns={patterns}
+          selection={selection}
+        />
 
         <section className="rounded-md border border-border bg-card p-5 text-card-foreground shadow-soft">
           <p className="text-sm font-medium text-muted-foreground">
