@@ -24,6 +24,7 @@ export function ImportReviewSurface({
   sources,
 }: ImportReviewSurfaceProps) {
   const stagedRecords = records.filter((record) => record.lifecycleState === "staged");
+  const groupedRecords = groupImportRecords(records);
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)] xl:items-start">
@@ -147,9 +148,21 @@ export function ImportReviewSurface({
           </div>
         </div>
 
-        {records.length > 0 ? (
-          records.map((record) => (
-            <ImportStagingCard key={record.id} record={record} />
+        {groupedRecords.length > 0 ? (
+          groupedRecords.map((group) => (
+            <section className="grid gap-3" key={group.key}>
+              <div className="rounded-md border border-border bg-background p-3">
+                <p className="text-sm font-semibold text-foreground">
+                  {group.label}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {group.description}
+                </p>
+              </div>
+              {group.records.map((record) => (
+                <ImportStagingCard key={record.id} record={record} />
+              ))}
+            </section>
           ))
         ) : (
           <EmptyImportReview hasConnectedSources={hasConnectedSources} />
@@ -193,4 +206,47 @@ function formatSourceType(value: ImportSourceSummary["sourceType"]) {
 
 function formatState(value: string) {
   return value.replaceAll("_", " ");
+}
+
+function groupImportRecords(records: ImportRecordSummary[]) {
+  const groups = new Map<
+    string,
+    { description: string; key: string; label: string; records: ImportRecordSummary[] }
+  >();
+
+  for (const record of records) {
+    const key = getGroupKey(record);
+    const existing = groups.get(key.key);
+
+    if (existing) {
+      existing.records.push(record);
+    } else {
+      groups.set(key.key, { ...key, records: [record] });
+    }
+  }
+
+  return [...groups.values()];
+}
+
+function getGroupKey(record: ImportRecordSummary) {
+  const dateValue = record.periodStartedAt ?? record.occurredAt;
+
+  if (!dateValue) {
+    return {
+      key: "needs-date-review",
+      label: "Needs date review",
+      description:
+        "These records have missing or ambiguous date metadata. You can still inspect them and decide placement later.",
+    };
+  }
+
+  const label = new Intl.DateTimeFormat("en", { dateStyle: "full" }).format(
+    new Date(dateValue),
+  );
+
+  return {
+    key: dateValue.slice(0, 10),
+    label,
+    description: "Records with source metadata that can be placed on this date or period.",
+  };
 }
